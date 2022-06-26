@@ -2,10 +2,13 @@
 
 namespace App\Entity;
 
-use ApiPlatform\Core\Annotation\ApiResource;
+use Doctrine\ORM\Mapping as ORM;
 use App\Controller\BurgerController;
 use App\Repository\BurgerRepository;
-use Doctrine\ORM\Mapping as ORM;
+use ApiPlatform\Core\Annotation\ApiFilter;
+use ApiPlatform\Core\Annotation\ApiResource;
+use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\SearchFilter;
+use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\NumericFilter;
 
 #[ORM\Entity(repositoryClass: BurgerRepository::class)]
 #[ApiResource(
@@ -45,6 +48,8 @@ use Doctrine\ORM\Mapping as ORM;
             ],
         ]
 )]
+#[ApiFilter(SearchFilter::class, properties: ['nom' => 'ipartial' ])]
+#[ApiFilter(NumericFilter::class, properties: ['prix'])]
 class Burger extends Produit
 {
    

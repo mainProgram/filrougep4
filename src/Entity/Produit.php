@@ -3,6 +3,7 @@
 namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+use App\Controller\ProduitController;
 use App\Repository\ProduitRepository;
 use ApiPlatform\Core\Annotation\ApiFilter;
 use ApiPlatform\Core\Annotation\ApiResource;
@@ -13,8 +14,16 @@ use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\NumericFilter;
 #[ORM\Entity(repositoryClass: ProduitRepository::class)]
 #[ORM\InheritanceType("JOINED")]
 #[ORM\DiscriminatorColumn(name:"type", type:"string")]
-#[ORM\DiscriminatorMap(["produit" => "Produit", "burger" => "Burger"])]
+#[ORM\DiscriminatorMap(["produit" => "Produit", "burger" => "Burger",  "frite" => "Frite",  "boisson" => "Boisson"])]
 #[ApiResource(
+    collectionOperations: [
+        "complements" => [
+            "status" => 200,
+            "path" => "/complements",
+            "controller" => ProduitController::class,
+            "route_name" => "complements"
+        ]
+    ],
     subresourceOperations: [
         "api_users_produits_get_subresource" => [
             "method" => "GET",
@@ -25,8 +34,8 @@ use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\NumericFilter;
         ]
     ]
 )]
-#[ApiFilter(SearchFilter::class, properties: ['type' => 'exact' ])]
-#[ApiFilter(NumericFilter::class, properties: ['prix'])]
+// #[ApiFilter(SearchFilter::class, properties: ['type' => 'exact' ])]
+// #[ApiFilter(NumericFilter::class, properties: ['prix'])]
 class Produit
 {
     #[ORM\Id]
