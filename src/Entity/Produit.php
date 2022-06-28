@@ -6,23 +6,35 @@ use Doctrine\ORM\Mapping as ORM;
 use App\Controller\ProduitController;
 use App\Repository\ProduitRepository;
 use ApiPlatform\Core\Annotation\ApiFilter;
+use Doctrine\Common\Collections\Collection;
 use ApiPlatform\Core\Annotation\ApiResource;
+use Doctrine\Common\Collections\ArrayCollection;
 use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Validator\Constraints as Assert;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\SearchFilter;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\NumericFilter;
 
 #[ORM\Entity(repositoryClass: ProduitRepository::class)]
 #[ORM\InheritanceType("JOINED")]
 #[ORM\DiscriminatorColumn(name:"type", type:"string")]
-#[ORM\DiscriminatorMap(["produit" => "Produit", "burger" => "Burger",  "frite" => "Frite",  "boisson" => "Boisson"])]
+#[ORM\DiscriminatorMap(["produit" => "Produit", "burger" => "Burger",  "frite" => "Frite",  "boisson" => "Boisson", "menu" => "Menu"])]
+#[ApiFilter(SearchFilter::class, properties: ['nom' => 'ipartial', "type" => "exact" ])]
+#[ApiFilter(NumericFilter::class, properties: ['prix'])]
 #[ApiResource(
     collectionOperations: [
-        "complements" => [
-            "status" => 200,
-            "path" => "/complements",
-            "controller" => ProduitController::class,
-            "route_name" => "complements"
-        ]
+        // "complements" => [
+        //     "status" => 200,
+        //     "path" => "/complements",
+        //     "controller" => ProduitController::class,
+        //     "route_name" => "complements"
+        // ],
+        // "catalogue" => [
+        //     "status" => 200,
+        //     "path" => "/catalogue",
+        //     "controller" => ProduitController::class,
+        //     "route_name" => "catalogue"
+        // ],
+        "get"
     ],
     subresourceOperations: [
         "api_users_produits_get_subresource" => [
@@ -31,11 +43,16 @@ use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\NumericFilter;
             "normalization_context" => [
                 "groups" => ["burger:list"]
             ]
+        ],
+        "api_menus_produits_get_subresource" => [
+            "method" => "GET",
+            "status" => 200,
+            "normalization_context" => [
+                "groups" => ["burger:list"]
+            ]
         ]
     ]
 )]
-// #[ApiFilter(SearchFilter::class, properties: ['type' => 'exact' ])]
-// #[ApiFilter(NumericFilter::class, properties: ['prix'])]
 class Produit
 {
     #[ORM\Id]
@@ -44,15 +61,18 @@ class Produit
     #[Groups(["burger:detail", "burger:list"])]
     protected $id;
 
-    #[Groups(["burger:detail", "burger:list"])]
-    #[ORM\Column(type: 'string', length: 50)]
+    #[Groups(["burger:detail", "burger:list", "menu:list", "menu:detail"])]
+    #[ORM\Column(type: 'string', length: 50, unique: true)]
+    #[Assert\NotBlank(message: "Ce champ est requis !")]
     protected $nom;
 
-    #[Groups(["burger:detail", "burger:list"])]
+    #[Groups(["burger:detail", "burger:list", "menu:list"])]
+    #[Assert\NotBlank(message: "Ce champ est requis !")]
+    #[Assert\Positive(message: "Le prix doit être supérieur à 0 !")]
     #[ORM\Column(type: 'float')]
     protected $prix;
 
-    #[Groups(["burger:detail"])]
+    #[Groups(["burger:detail", "menu:list"])]
     #[ORM\Column(type: 'object')]
     protected $image;
 
@@ -68,6 +88,14 @@ class Produit
     #[ORM\ManyToOne(targetEntity: User::class, inversedBy: 'produits')]
     #[ORM\JoinColumn(nullable: false)]
     private $user;
+
+    #[ORM\ManyToMany(targetEntity: Menu::class, mappedBy: 'produits')]
+    private $menus;
+
+    public function __construct()
+    {
+        $this->menus = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
@@ -142,6 +170,33 @@ class Produit
     public function setUser(?User $user): self
     {
         $this->user = $user;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Menu>
+     */
+    public function getMenus(): Collection
+    {
+        return $this->menus;
+    }
+
+    public function addMenu(Menu $menu): self
+    {
+        if (!$this->menus->contains($menu)) {
+            $this->menus[] = $menu;
+            $menu->addProduit($this);
+        }
+
+        return $this;
+    }
+
+    public function removeMenu(Menu $menu): self
+    {
+        if ($this->menus->removeElement($menu)) {
+            $menu->removeProduit($this);
+        }
 
         return $this;
     }

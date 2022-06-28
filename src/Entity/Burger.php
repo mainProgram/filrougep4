@@ -16,6 +16,8 @@ use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\NumericFilter;
         "get" => [
             "method" => "get",
             "status" => 200,
+            "security" => "is_granted('ROLE_GESTIONNAIRE')",
+            "security_message" => "Vous n'êtes pas autorisé !",
             "normalization_context" => [
                 "groups" => ["burger:list"]
             ]
@@ -37,16 +39,26 @@ use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\NumericFilter;
             "path" => "/addBurger",
             "controller" => BurgerController::class
         ]
+    ],
+    itemOperations: [
+        "get" => [
+            "method" => "get",
+            "status" => 200,
+            "normalization_context" => [
+                "groups" => ["burger:detail"]
+            ]
         ],
-        itemOperations: [
-            "get" => [
-                "method" => "get",
-                "status" => 200,
-                "normalization_context" => [
-                    "groups" => ["burger:detail"]
-                ]
-            ],
+        "delete" => [
+            "method" => "delete",
+            "security" => "is_granted('ROLE_GESTIONNAIRE')",
+            "security_message" => "Vous n'êtes pas autorisé !",
+        ],
+        "put" => [
+            "method" => "put",
+            "security" => "is_granted('ROLE_GESTIONNAIRE')",
+            "security_message" => "Vous n'êtes pas autorisé !",
         ]
+    ]
 )]
 #[ApiFilter(SearchFilter::class, properties: ['nom' => 'ipartial' ])]
 #[ApiFilter(NumericFilter::class, properties: ['prix'])]

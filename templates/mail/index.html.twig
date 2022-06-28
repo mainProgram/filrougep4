@@ -6,7 +6,7 @@
 <div>
     <h1>Bonjour {{ user.nom }}! </h1>
 
-    <p>Cliquer sur ce lien pour activer votre compte</p> <a href="{{ url('api_users_patch_collection', { "token": user.token }) }}">ici</a>
+    <p>Cliquer sur ce lien pour activer votre compte</p> <a href="{{ url('api_users_post_collection', { "token": user.token }) }}">ici</a>
    
 </div>
 {#  #}

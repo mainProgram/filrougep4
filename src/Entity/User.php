@@ -10,6 +10,7 @@ use ApiPlatform\Core\Annotation\ApiResource;
 use ApiPlatform\Core\Annotation\ApiSubresource;
 use Doctrine\Common\Collections\ArrayCollection;
 use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 
@@ -19,8 +20,8 @@ use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 #[ORM\DiscriminatorMap(["user" => "User", "gestionnaire" => "Gestionnaire", "client" => "Client"])]
 #[ApiResource(
     collectionOperations: [
-        "patch" => [
-            "method" => "patch",
+        "post" => [
+            "method" => "post",
             "deserialize"=> false,
             "path" => "/users/validate/{token}",
             "controller" => MailController::class
@@ -33,45 +34,51 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\GeneratedValue]
     #[ORM\Column(type: 'integer')]
     #[Groups("burger:detail")]
-    private $id;
+    protected $id;
 
     #[ORM\Column(type: 'string', length: 180, unique: true)]
+    #[Assert\NotBlank(message: "Ce champ est requis !")]
     #[Groups("burger:detail")]
-    private $email;
+    protected $email;
 
     #[ORM\Column(type: 'json')]
-    private $roles = [];
+    protected $roles = [];
 
+    #[Assert\NotBlank(message: "Ce champ est requis !")]
     #[ORM\Column(type: 'string')]
-    private $password;
+    protected $password;
 
+    #[Assert\NotBlank(message: "Ce champ est requis !")]
     #[ORM\Column(type: 'string', length: 40)]
-    private $nom;
+    protected $nom;
 
+    #[Assert\NotBlank(message: "Ce champ est requis !")]
     #[ORM\Column(type: 'string', length: 40)]
-    private $prenom;
+    protected $prenom;
 
+    #[Assert\NotBlank(message: "Ce champ est requis !")]
     #[ORM\Column(type: 'string', length: 30)]
-    private $telephone;
+    protected $telephone;
 
     #[ORM\Column(type: 'boolean')]
-    private $isEtat = true;
+    protected $isEtat = true;
 
+    #[Assert\NotBlank(message: "Ce champ est requis !")]
     #[ORM\Column(type: 'text')]
-    private $adresse;
+    protected $adresse;
 
     #[ApiSubresource()]
     #[ORM\OneToMany(mappedBy: 'user', targetEntity: Produit::class)]
-    private $produits;
+    protected $produits;
 
     #[ORM\Column(type: 'string', length: 255, nullable: true)]
-    private $token;
+    protected $token;
 
     #[ORM\Column(type: 'boolean', nullable: true)] //Compte bloqué par défaut
-    private $isActivated = false;
+    protected $isActivated = false;
 
     #[ORM\Column(type: 'datetime', nullable: true)]
-    private $expiredAt;
+    protected $expiredAt;
 
     public function __construct()
     {
