@@ -89,9 +89,13 @@ class Produit
     #[ORM\JoinColumn(nullable: false)]
     private $user;
 
+    #[ORM\OneToMany(targetEntity: CommandeProduit::class, mappedBy: 'produit')]
+    private $commandeProduits;
+
     public function __construct()
     {
         $this->menus = new ArrayCollection();
+        $this->commandeProduits = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -167,6 +171,54 @@ class Produit
     public function setUser(?User $user): self
     {
         $this->user = $user;
+
+        return $this;
+    }
+
+    /**
+    //  * @return Collection<int, Commande>
+    //  */
+    // public function getCommandeProduits(): Collection
+    // {
+    //     return $this->commandeProduits;
+    // }
+
+    // public function addCommandeProduits(Commande $commande): self
+    // {
+    //     if (!$this->commandeProduits->contains($commande)) {
+    //         $this->commandeProduits[] = $commande;
+    //         $commande->addProduit($this);
+    //     }
+
+    //     return $this;
+    // }
+
+    // public function removeCommandeProduits(Commande $commande): self
+    // {
+    //     if ($this->commandeProduits->removeElement($commande)) {
+    //         $commande->removeProduit($this);
+    //     }
+
+    //     return $this;
+    // }
+
+
+    /**
+     * Get the value of commandeProduits
+     */ 
+    public function getCommandeProduits()
+    {
+        return $this->commandeProduits;
+    }
+
+    /**
+     * Set the value of commandeProduits
+     *
+     * @return  self
+     */ 
+    public function setCommandeProduits($commandeProduits)
+    {
+        $this->commandeProduits = $commandeProduits;
 
         return $this;
     }
