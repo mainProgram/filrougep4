@@ -4,12 +4,28 @@ namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 use App\Repository\ZoneRepository;
+use Doctrine\Common\Collections\Collection;
 use ApiPlatform\Core\Annotation\ApiResource;
+use Symfony\Component\Security\Core\Role\Role;
+use Doctrine\Common\Collections\ArrayCollection;
+use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
+use Symfony\Component\Security\Core\Role\RoleHierarchy;
 
 #[ORM\Entity(repositoryClass: ZoneRepository::class)]
 #[ApiResource(
-    
+   security: 'is_granted("ROLE_GESTIONNAIRE")',
+   securityMessage: "Vous n'êtes pas autorisé !",
+   collectionOperations: [
+    "get" => [
+        "normalization_context" => [
+            "groups" => [
+                "zone:list"
+            ]
+        ]
+    ],
+    "post"
+]
 )]
 class Zone
 {
@@ -19,13 +35,27 @@ class Zone
     private $id;
 
     #[Assert\NotBlank(message: "Ce champ est requis !")]
-    #[ORM\Column(type: 'string', length: 20)]
+    #[ORM\Column(type: 'string', length: 20, unique: true)]
+    #[Groups(["zone:list"])]
     private $nom;
 
     #[Assert\NotBlank(message: "Ce champ est requis !")]
     #[Assert\Positive(message: "Le prix doit être supérieur à 0 !")]
+    #[Groups(["zone:list"])]
     #[ORM\Column(type: 'float')]
     private $prix;
+
+    #[ORM\Column(type: 'boolean', nullable: true)]
+    private $isEtat = true;
+
+    #[ORM\OneToMany(mappedBy: 'zone', targetEntity: Quartier::class)]
+    #[Groups(["zone:list"])]
+    private $quartiers;
+
+    public function __construct()
+    {
+        $this->quartiers = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
@@ -52,6 +82,48 @@ class Zone
     public function setPrix(float $prix): self
     {
         $this->prix = $prix;
+
+        return $this;
+    }
+
+    public function isIsEtat(): ?bool
+    {
+        return $this->isEtat;
+    }
+
+    public function setIsEtat(?bool $isEtat): self
+    {
+        $this->isEtat = $isEtat;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Quartier>
+     */
+    public function getQuartiers(): Collection
+    {
+        return $this->quartiers;
+    }
+
+    public function addQuartier(Quartier $quartier): self
+    {
+        if (!$this->quartiers->contains($quartier)) {
+            $this->quartiers[] = $quartier;
+            $quartier->setZone($this);
+        }
+
+        return $this;
+    }
+
+    public function removeQuartier(Quartier $quartier): self
+    {
+        if ($this->quartiers->removeElement($quartier)) {
+            // set the owning side to null (unless already changed)
+            if ($quartier->getZone() === $this) {
+                $quartier->setZone(null);
+            }
+        }
 
         return $this;
     }
