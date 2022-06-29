@@ -17,7 +17,7 @@ use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 #[ORM\Entity(repositoryClass: UserRepository::class)]
 #[ORM\InheritanceType("JOINED")]
 #[ORM\DiscriminatorColumn(name:"role", type:"string")]
-#[ORM\DiscriminatorMap(["user" => "User", "gestionnaire" => "Gestionnaire", "client" => "Client"])]
+#[ORM\DiscriminatorMap(["user" => "User", "gestionnaire" => "Gestionnaire", "client" => "Client",  "livreur" => "Livreur"])]
 #[ApiResource(
     collectionOperations: [
         "post" => [
@@ -37,7 +37,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     protected $id;
 
     #[ORM\Column(type: 'string', length: 180, unique: true)]
-    #[Assert\NotBlank(message: "Ce champ est requis !")]
+    // #[Assert\NotBlank(message: "Ce champ est requis !")]
     #[Groups("burger:detail")]
     protected $email;
 
