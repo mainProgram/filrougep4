@@ -38,7 +38,7 @@ security:
         - { path: ^/api$, roles: PUBLIC_ACCESS }
         - { path: ^/api/burgers/, roles: PUBLIC_ACCESS, methods: [GET] }
         - { path: ^/api/burgers\\?, roles: PUBLIC_ACCESS } #not working yet
-        - { path: ^/api/catalogue, roles: PUBLIC_ACCESS, methods: [GET] }
+        - { path: ^/api/catalogue, roles: PUBLIC_ACCESS }
         - { path: ^/api, roles: IS_AUTHENTICATED_FULLY }
 
 

@@ -63,10 +63,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(type: 'boolean')]
     protected $isEtat = true;
 
-    #[Assert\NotBlank(message: "Ce champ est requis !")]
-    #[ORM\Column(type: 'text')]
-    protected $adresse;
-
     #[ApiSubresource()]
     #[ORM\OneToMany(mappedBy: 'user', targetEntity: Produit::class)]
     protected $produits;
@@ -209,18 +205,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function setIsEtat(bool $isEtat): self
     {
         $this->isEtat = $isEtat;
-
-        return $this;
-    }
-
-    public function getAdresse(): ?string
-    {
-        return $this->adresse;
-    }
-
-    public function setAdresse(string $adresse): self
-    {
-        $this->adresse = $adresse;
 
         return $this;
     }

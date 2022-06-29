@@ -2,15 +2,13 @@
 #
 
 namespace App\DataProvider;
-
-use App\Entity\Burger;
-use App\Entity\Produit;
+use App\Entity\Catalogue;
+use App\Repository\MenuRepository;
 use App\Repository\BurgerRepository;
 use ApiPlatform\Core\DataProvider\RestrictedDataProviderInterface;
 use ApiPlatform\Core\DataProvider\ContextAwareCollectionDataProviderInterface;
-use App\Repository\MenuRepository;
 
-class ProductDataProvider implements ContextAwareCollectionDataProviderInterface, RestrictedDataProviderInterface {
+class CatalogueDataProvider implements ContextAwareCollectionDataProviderInterface, RestrictedDataProviderInterface {
 
     public function __construct(BurgerRepository $bgrepo, MenuRepository $menurepo)
     {
@@ -21,15 +19,13 @@ class ProductDataProvider implements ContextAwareCollectionDataProviderInterface
     public function getCollection(string $resourceClass, string $operationName = null, array $context = [])
     {
         $tab[] = $this->bgrepo->findBy(["isEtat" => 1]);
-        $tab[] = $this->repo->findBy(["isEtat" => 1]);
-             
-            return  $tab;
-
+        $tab[] = $this->menurepo->findBy(["isEtat" => 1]);     
+        return  $tab;
     }
 
     public function supports(string $resourceClass, string $operationName = null, array $context = []): bool
     {
-        return  $resourceClass == Burger::class or  $resourceClass == Menu::class;
+        return  $resourceClass == Catalogue::class;
     }
     
 }

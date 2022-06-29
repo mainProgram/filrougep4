@@ -61,14 +61,14 @@ class Produit
     #[Groups(["burger:detail", "burger:list"])]
     protected $id;
 
-    #[Groups(["burger:detail", "burger:list", "menu:list", "menu:detail"])]
+    #[Groups(["burger:detail", "burger:list", "menu:list", "menu:detail", "taille_boisson"])]
     #[ORM\Column(type: 'string', length: 50, unique: true)]
     #[Assert\NotBlank(message: "Ce champ est requis !")]
     protected $nom;
 
     #[Groups(["burger:detail", "burger:list", "menu:list"])]
-    #[Assert\NotBlank(message: "Ce champ est requis !")]
-    #[Assert\Positive(message: "Le prix doit être supérieur à 0 !")]
+    // #[Assert\NotBlank(message: "Ce champ est requis !")]
+    // #[Assert\Positive(message: "Le prix doit être supérieur à 0 !")]
     #[ORM\Column(type: 'float')]
     protected $prix;
 
@@ -88,9 +88,6 @@ class Produit
     #[ORM\ManyToOne(targetEntity: User::class, inversedBy: 'produits')]
     #[ORM\JoinColumn(nullable: false)]
     private $user;
-
-    #[ORM\ManyToMany(targetEntity: Menu::class, mappedBy: 'produits')]
-    private $menus;
 
     public function __construct()
     {
@@ -170,33 +167,6 @@ class Produit
     public function setUser(?User $user): self
     {
         $this->user = $user;
-
-        return $this;
-    }
-
-    /**
-     * @return Collection<int, Menu>
-     */
-    public function getMenus(): Collection
-    {
-        return $this->menus;
-    }
-
-    public function addMenu(Menu $menu): self
-    {
-        if (!$this->menus->contains($menu)) {
-            $this->menus[] = $menu;
-            $menu->addProduit($this);
-        }
-
-        return $this;
-    }
-
-    public function removeMenu(Menu $menu): self
-    {
-        if ($this->menus->removeElement($menu)) {
-            $menu->removeProduit($this);
-        }
 
         return $this;
     }

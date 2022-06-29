@@ -2,21 +2,35 @@
 
 namespace App\Entity;
 
-use Doctrine\ORM\Mapping as ORM;
-use App\Repository\CatalogueRepository;
+use ApiPlatform\Core\Annotation\ApiFilter;
+use ApiPlatform\Core\Serializer\Filter\PropertyFilter;
 use ApiPlatform\Core\Annotation\ApiResource;
+use Doctrine\Common\Collections\ArrayCollection;
+use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\SearchFilter;
+use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\NumericFilter;
+use ApiPlatform\Core\Annotation\ApiProperty;
 
-#[ORM\Entity(repositoryClass: CatalogueRepository::class)]
-#[ApiResource()]
+#[ApiResource(
+    collectionOperations:[
+        "catalogue" => [
+            "method" => "get",
+            "status" => 200,
+            "path" => "/catalogue",
+            "normalization_context" => [
+                "groups" => ["menu:list"]
+            ]
+        ]
+    ],  
+    itemOperations: []
+)]
+// #[ApiFilter(SearchFilter::class, properties: ['menus.nom' => 'ipartial', 'burgers.nom' => 'ipartial'])]
+// #[ApiFilter(NumericFilter::class, properties: ['menus.prix'])]
+// #[ApiFilter(PropertyFilter::class)]
+
 class Catalogue
 {
-    #[ORM\Id]
-    #[ORM\GeneratedValue]
-    #[ORM\Column(type: 'integer')]
-    private $id;
+    #[ApiProperty(identifier:true)]
+    private $code;
 
-    public function getId(): ?int
-    {
-        return $this->id;
-    }
+   
 }

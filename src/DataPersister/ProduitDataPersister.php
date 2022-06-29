@@ -23,6 +23,24 @@ class ProduitDataPersister implements DataPersisterInterface
 
     public function persist($data)
     {
+        if($data instanceof Boisson)
+            $data->setPrix((0));
+        elseif ($data instanceof Menu)
+        {
+            $prix = 0;
+
+            foreach($data->getBurgers() as $burger)
+                $prix+= $burger->getPrix();
+
+            foreach($data->getFrites() as $frite)
+                $prix+= $frite->getPrix();
+
+            foreach($data->getTailleBoissons() as $boisson)
+                $prix+= $boisson->getPrix();
+
+            $prix -= $prix * 0.05;
+            $data->setPrix($prix);
+        }
         $this->entityManager->persist($data);       
         $this->entityManager->flush();       
     }
