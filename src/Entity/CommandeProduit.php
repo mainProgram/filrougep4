@@ -2,11 +2,10 @@
 
 namespace App\Entity;
 
-use Symfony\Component\Validator\Constraints as Assert;
+use App\Repository\CommandeProduitRepository;
 use Doctrine\ORM\Mapping as ORM;
-use Symfony\Component\Console\Command\Command;
 
-#[ORM\Entity]
+#[ORM\Entity(repositoryClass: CommandeProduitRepository::class)]
 class CommandeProduit
 {
     #[ORM\Id]
@@ -14,108 +13,72 @@ class CommandeProduit
     #[ORM\Column(type: 'integer')]
     private $id;
 
-    #[Assert\NotBlank(message: "Ce champ est requis !")]
-    #[Assert\Positive(message: "Le prix doit être supérieur à 0 !")]
-    #[ORM\Column(type: 'float')]
-    private $prix;
-
-    #[Assert\NotBlank(message: "Ce champ est requis !")]
-    #[Assert\Positive(message: "Le prix doit être supérieur à 0 !")]
-    #[ORM\Column(type: 'float')]
+    #[ORM\Column(type: 'integer', nullable: true)]
     private $quantite;
 
-    #[ORM\ManyToOne(targetEntity: Produit::class, inversedBy: "commandeProduits")]
+    #[ORM\Column(type: 'float', nullable: true)]
+    private $prix;
+
+    #[ORM\ManyToOne(targetEntity: Produit::class, inversedBy: 'commandeProduits')]
     private $produit;
 
-    #[ORM\ManyToOne(targetEntity: Commande::class, inversedBy: "commandeProduits")]
+    #[ORM\ManyToOne(targetEntity: Commande::class, inversedBy: 'commandeProduits')]
     private $commande;
 
+    
 
-    /**
-     * Get the value of id
-     */ 
-    public function getId()
+    public function getId(): ?int
     {
         return $this->id;
     }
 
-    /**
-     * Get the value of prix
-     */ 
-    public function getPrix()
-    {
-        return $this->prix;
-    }
-
-    /**
-     * Set the value of prix
-     *
-     * @return  self
-     */ 
-    public function setPrix($prix)
-    {
-        $this->prix = $prix;
-
-        return $this;
-    }
-
-    /**
-     * Get the value of quantite
-     */ 
-    public function getQuantite()
+    public function getQuantite(): ?int
     {
         return $this->quantite;
     }
 
-    /**
-     * Set the value of quantite
-     *
-     * @return  self
-     */ 
-    public function setQuantite($quantite)
+    public function setQuantite(?int $quantite): self
     {
         $this->quantite = $quantite;
 
         return $this;
     }
 
-    /**
-     * Get the value of commande
-     */ 
-    public function getCommande()
+    public function getPrix(): ?float
+    {
+        return $this->prix;
+    }
+
+    public function setPrix(?float $prix): self
+    {
+        $this->prix = $prix;
+
+        return $this;
+    }
+
+    public function getProduit(): ?Produit
+    {
+        return $this->produit;
+    }
+
+    public function setProduit(?Produit $produit): self
+    {
+        $this->produit = $produit;
+
+        return $this;
+    }
+
+    public function getCommande(): ?Commande
     {
         return $this->commande;
     }
 
-    /**
-     * Set the value of commande
-     *
-     * @return  self
-     */ 
-    public function setCommande($commande)
+    public function setCommande(?Commande $commande): self
     {
         $this->commande = $commande;
 
         return $this;
     }
 
-    /**
-     * Get the value of produit
-     */ 
-    public function getProduit()
-    {
-        return $this->produit;
-    }
-
-    /**
-     * Set the value of produit
-     *
-     * @return  self
-     */ 
-    public function setProduit($produit)
-    {
-        $this->produit = $produit;
-
-        return $this;
-    }
+  
 }

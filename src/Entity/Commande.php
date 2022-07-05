@@ -7,9 +7,21 @@ use App\Repository\CommandeRepository;
 use Doctrine\Common\Collections\Collection;
 use ApiPlatform\Core\Annotation\ApiResource;
 use Doctrine\Common\Collections\ArrayCollection;
+use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Serializer\Annotation\SerializedName;
 
 #[ORM\Entity(repositoryClass: CommandeRepository::class)]
-#[ApiResource]
+#[ApiResource(
+    collectionOperations:[
+        "post" => [
+            "denormalization_context" =>[
+                "groups" => [
+                    "commande:write"
+                ]
+            ]
+        ]
+    ]
+)]
 class Commande
 {
     #[ORM\Id]
@@ -32,14 +44,17 @@ class Commande
     #[ORM\OneToOne(targetEntity: Ticket::class, cascade: ['persist', 'remove'])]
     private $ticket;
 
-    #[ORM\OneToMany(targetEntity: CommandeProduit::class, mappedBy: 'commande')]
-    private $commandeProduits;
+    // #[SerializedName("produits")]
+
 
     #[ORM\Column(type: 'string', length: 10)]
-    private $etat;
+    private $etat = "";
 
     #[ORM\Column(type: 'boolean', nullable: true)]
     private $paye;
+
+    #[ORM\OneToMany(mappedBy: 'commande', targetEntity: CommandeProduit::class)]
+    private $commandeProduits;
 
     public function __construct()
     {
@@ -111,49 +126,7 @@ class Commande
         return $this;
     }
 
-    // /**
-    //  * @return Collection<int, Produit>
-    //  */
-    // public function getCommandeProduits(): Collection
-    // {
-    //     return $this->commandeProduits;
-    // }
-
-    // public function addCommandeProduits(Produit $produit): self
-    // {
-    //     if (!$this->commandeProduits->contains($produit)) {
-    //         $this->commandeProduits[] = $produit;
-    //     }
-
-    //     return $this;
-    // }
-
-    // public function removeCommandeProduits(Produit $produit): self
-    // {
-    //     $this->commandeProduits->removeElement($produit);
-
-    //     return $this;
-    // }
-
-    /**
-     * Get the value of commandeProduits
-     */ 
-    public function getCommandeProduits()
-    {
-        return $this->commandeProduits;
-    }
-
-    /**
-     * Set the value of commandeProduits
-     *
-     * @return  self
-     */ 
-    public function setCommandeProduits($commandeProduits)
-    {
-        $this->commandeProduits = $commandeProduits;
-
-        return $this;
-    }
+   
 
     public function getEtat(): ?string
     {
@@ -175,6 +148,36 @@ class Commande
     public function setPaye(?bool $paye): self
     {
         $this->paye = $paye;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, CommandeProduit>
+     */
+    public function getCommandeProduits(): Collection
+    {
+        return $this->commandeProduits;
+    }
+
+    public function addCommandeProduit(CommandeProduit $commandeProduit): self
+    {
+        if (!$this->commandeProduits->contains($commandeProduit)) {
+            $this->commandeProduits[] = $commandeProduit;
+            $commandeProduit->setCommande($this);
+        }
+
+        return $this;
+    }
+
+    public function removeCommandeProduit(CommandeProduit $commandeProduit): self
+    {
+        if ($this->commandeProduits->removeElement($commandeProduit)) {
+            // set the owning side to null (unless already changed)
+            if ($commandeProduit->getCommande() === $this) {
+                $commandeProduit->setCommande(null);
+            }
+        }
 
         return $this;
     }

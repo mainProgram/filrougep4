@@ -2,6 +2,7 @@
 
 namespace App\Entity;
 
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use App\Repository\ProduitRepository;
 use ApiPlatform\Core\Annotation\ApiFilter;
@@ -21,30 +22,12 @@ use App\Controller\ImageController;
 #[ApiFilter(NumericFilter::class, properties: ['prix'])]
 #[ApiResource(
     collectionOperations: [
-        // "complements" => [
-        //     "status" => 200,
-        //     "path" => "/complements",
-        //     "controller" => ProduitController::class,
-        //     "route_name" => "complements"
-        // ],
-        // "catalogue" => [
-        //     "status" => 200,
-        //     "path" => "/catalogue",
-        //     "controller" => ProduitController::class,
-        //     "route_name" => "catalogue"
-        // ],
         "get",
         "/archives" => [
             "status" => 200,
             "path" => "/archives",
             "method" => "GET"
         ],
-        // "post" => [
-        //     "method" => "post",
-        //     "path" => "/addImg",
-        //     "controller" => ImageController::class,
-        //     "deserialize" => false
-        // ]
         'post' => [
             'validate' => false,
             'input_formats' => [
@@ -83,7 +66,7 @@ class Produit
     protected $nom;
 
     #[Groups(["burger:detail", "burger:list", "menu:list"])]
-    #[Assert\NotBlank(message: "Ce champ est requis !")]
+    // #[Assert\NotBlank(message: "Ce champ est requis !")]
     // #[Assert\Positive(message: "Le prix doit être supérieur à 0 !")]
     #[ORM\Column(type: 'float', nullable: true)]
     protected $prix;
@@ -101,17 +84,19 @@ class Produit
     #[ORM\JoinColumn(nullable: false)]
     protected $user;
 
-    #[ORM\OneToMany(targetEntity: CommandeProduit::class, mappedBy: 'produit')]
-    protected $commandeProduits;
-
     #[ORM\Column(type: 'blob', nullable: true)]
     protected $image;
 
     // #[ORM\Column(type: 'object', nullable: true)]
     private $imageWrapper;
-  
+
+    #[ORM\OneToMany(mappedBy: 'produit', targetEntity: CommandeProduit::class)]
+    private $commandeProduits;
+
+ 
     public function __construct()
     {
+        $this->commande = new ArrayCollection();
         $this->commandeProduits = new ArrayCollection();
     }
 
@@ -180,54 +165,6 @@ class Produit
         return $this;
     }
 
-    /**
-    //  * @return Collection<int, Commande>
-    //  */
-    // public function getCommandeProduits(): Collection
-    // {
-    //     return $this->commandeProduits;
-    // }
-
-    // public function addCommandeProduits(Commande $commande): self
-    // {
-    //     if (!$this->commandeProduits->contains($commande)) {
-    //         $this->commandeProduits[] = $commande;
-    //         $commande->addProduit($this);
-    //     }
-
-    //     return $this;
-    // }
-
-    // public function removeCommandeProduits(Commande $commande): self
-    // {
-    //     if ($this->commandeProduits->removeElement($commande)) {
-    //         $commande->removeProduit($this);
-    //     }
-
-    //     return $this;
-    // }
-
-
-    /**
-     * Get the value of commandeProduits
-     */ 
-    public function getCommandeProduits()
-    {
-        return $this->commandeProduits;
-    }
-
-    /**
-     * Set the value of commandeProduits
-     *
-     * @return  self
-     */ 
-    public function setCommandeProduits($commandeProduits)
-    {
-        $this->commandeProduits = $commandeProduits;
-
-        return $this;
-    }
-
     public function getImage()
     {
         // $photo = @stream_get_contents($this->image);
@@ -257,6 +194,37 @@ class Produit
         return $this;
     }
 
-   
+    /**
+     * @return Collection<int, CommandeProduit>
+     */
+    public function getCommandeProduits(): Collection
+    {
+        return $this->commandeProduits;
+    }
 
+    public function addCommandeProduit(CommandeProduit $commandeProduit): self
+    {
+        if (!$this->commandeProduits->contains($commandeProduit)) {
+            $this->commandeProduits[] = $commandeProduit;
+            $commandeProduit->setProduit($this);
+        }
+
+        return $this;
+    }
+
+    public function removeCommandeProduit(CommandeProduit $commandeProduit): self
+    {
+        if ($this->commandeProduits->removeElement($commandeProduit)) {
+            // set the owning side to null (unless already changed)
+            if ($commandeProduit->getProduit() === $this) {
+                $commandeProduit->setProduit(null);
+            }
+        }
+
+        return $this;
+    }
+
+  
+
+    
 }

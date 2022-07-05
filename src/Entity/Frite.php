@@ -2,11 +2,12 @@
 
 namespace App\Entity;
 
-use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use App\Repository\FriteRepository;
+use Doctrine\Common\Collections\Collection;
 use ApiPlatform\Core\Annotation\ApiResource;
+use Doctrine\Common\Collections\ArrayCollection;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\Entity(repositoryClass: FriteRepository::class)]
 #[ApiResource(
@@ -27,7 +28,9 @@ use ApiPlatform\Core\Annotation\ApiResource;
             "security_message" => "Vous n'êtes pas autorisé !",
             "normalization_context" => [
                 "groups" => ["burger:detail"]
-            ]
+            ],
+           
+            
         ],
     ],
     itemOperations: [
@@ -52,37 +55,40 @@ use ApiPlatform\Core\Annotation\ApiResource;
 )]
 class Frite extends Produit
 {
-    #[ORM\ManyToMany(targetEntity: Menu::class, mappedBy: 'frites')]
-    private $menus;
+    #[ORM\OneToMany(mappedBy: 'frite', targetEntity: MenuFrite::class)]
+    private $menuFrites;
 
     public function __construct()
     {
         parent::__construct();
-        $this->menus = new ArrayCollection();
+        $this->menuFrites = new ArrayCollection();
     }
 
     /**
-     * @return Collection<int, Menu>
+     * @return Collection<int, MenuFrite>
      */
-    public function getMenus(): Collection
+    public function getMenuFrites(): Collection
     {
-        return $this->menus;
+        return $this->menuFrites;
     }
 
-    public function addMenu(Menu $menu): self
+    public function addMenuFrite(MenuFrite $menuFrite): self
     {
-        if (!$this->menus->contains($menu)) {
-            $this->menus[] = $menu;
-            $menu->addFrite($this);
+        if (!$this->menuFrites->contains($menuFrite)) {
+            $this->menuFrites[] = $menuFrite;
+            $menuFrite->setFrite($this);
         }
 
         return $this;
     }
 
-    public function removeMenu(Menu $menu): self
+    public function removeMenuFrite(MenuFrite $menuFrite): self
     {
-        if ($this->menus->removeElement($menu)) {
-            $menu->removeFrite($this);
+        if ($this->menuFrites->removeElement($menuFrite)) {
+            // set the owning side to null (unless already changed)
+            if ($menuFrite->getFrite() === $this) {
+                $menuFrite->setFrite(null);
+            }
         }
 
         return $this;

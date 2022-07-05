@@ -29,6 +29,7 @@ class ProduitDataPersister implements DataPersisterInterface
 
     public function persist($data)
     {
+        // dd($data);
         if($data instanceof Boisson)
             $data->setPrix((0));
         elseif ($data instanceof Menu)
