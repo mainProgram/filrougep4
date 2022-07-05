@@ -32,7 +32,7 @@ class ProductDataProvider implements ContextAwareCollectionDataProviderInterface
     public function supports(string $resourceClass, string $operationName = null, array $context = []): bool
     {
         // return  $resourceClass == Burger::class or  $resourceClass == Boisson::class;
-        return  $resourceClass == Produit::class;
+        return  $resourceClass == "";
     }
     
 }

@@ -3,22 +3,21 @@
 namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
-use App\Controller\ProduitController;
 use App\Repository\ProduitRepository;
 use ApiPlatform\Core\Annotation\ApiFilter;
-use Doctrine\Common\Collections\Collection;
 use ApiPlatform\Core\Annotation\ApiResource;
 use Doctrine\Common\Collections\ArrayCollection;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\SearchFilter;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\NumericFilter;
+use App\Controller\ImageController;
 
 #[ORM\Entity(repositoryClass: ProduitRepository::class)]
 #[ORM\InheritanceType("JOINED")]
 #[ORM\DiscriminatorColumn(name:"type", type:"string")]
 #[ORM\DiscriminatorMap(["produit" => "Produit", "burger" => "Burger",  "frite" => "Frite",  "boisson" => "Boisson", "menu" => "Menu"])]
-#[ApiFilter(SearchFilter::class, properties: ['nom' => 'ipartial', "type" => "exact" ])]
+#[ApiFilter(SearchFilter::class, properties: ['nom' => 'ipartial', "isEtat" => "partial" ])]
 #[ApiFilter(NumericFilter::class, properties: ['prix'])]
 #[ApiResource(
     collectionOperations: [
@@ -34,7 +33,24 @@ use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\NumericFilter;
         //     "controller" => ProduitController::class,
         //     "route_name" => "catalogue"
         // ],
-        "get"
+        "get",
+        "/archives" => [
+            "status" => 200,
+            "path" => "/archives",
+            "method" => "GET"
+        ],
+        // "post" => [
+        //     "method" => "post",
+        //     "path" => "/addImg",
+        //     "controller" => ImageController::class,
+        //     "deserialize" => false
+        // ]
+        'post' => [
+            'validate' => false,
+            'input_formats' => [
+                'multipart' => ['multipart/form-data'],
+            ],
+        ],
     ],
     subresourceOperations: [
         "api_users_produits_get_subresource" => [
@@ -67,16 +83,12 @@ class Produit
     protected $nom;
 
     #[Groups(["burger:detail", "burger:list", "menu:list"])]
-    // #[Assert\NotBlank(message: "Ce champ est requis !")]
+    #[Assert\NotBlank(message: "Ce champ est requis !")]
     // #[Assert\Positive(message: "Le prix doit être supérieur à 0 !")]
-    #[ORM\Column(type: 'float')]
+    #[ORM\Column(type: 'float', nullable: true)]
     protected $prix;
 
-    #[Groups(["burger:detail", "menu:list"])]
-    #[ORM\Column(type: 'object')]
-    protected $image;
-
-    #[Groups(["burger:detail"])]
+    #[Groups(["burger:detail", "menu:detail"])]
     #[ORM\Column(type: 'boolean')]
     protected $isEtat = 1;
 
@@ -87,14 +99,19 @@ class Produit
     #[Groups(["burger:detail"])]
     #[ORM\ManyToOne(targetEntity: User::class, inversedBy: 'produits')]
     #[ORM\JoinColumn(nullable: false)]
-    private $user;
+    protected $user;
 
     #[ORM\OneToMany(targetEntity: CommandeProduit::class, mappedBy: 'produit')]
-    private $commandeProduits;
+    protected $commandeProduits;
 
+    #[ORM\Column(type: 'blob', nullable: true)]
+    protected $image;
+
+    // #[ORM\Column(type: 'object', nullable: true)]
+    private $imageWrapper;
+  
     public function __construct()
     {
-        $this->menus = new ArrayCollection();
         $this->commandeProduits = new ArrayCollection();
     }
 
@@ -123,18 +140,6 @@ class Produit
     public function setPrix(float $prix): self
     {
         $this->prix = $prix;
-
-        return $this;
-    }
-
-    public function getImage(): ?object
-    {
-        return $this->image;
-    }
-
-    public function setImage(object $image): self
-    {
-        $this->image = $image;
 
         return $this;
     }
@@ -222,4 +227,36 @@ class Produit
 
         return $this;
     }
+
+    public function getImage()
+    {
+        // $photo = @stream_get_contents($this->image);
+        // @fclose($this->image);
+        // return base64_encode($photo);
+        // dd(utf8_encode(base64_encode($this->image)));
+        return utf8_encode(base64_encode($this->image));
+        // return utf8_encode(base64_encode($this->image));
+    }
+
+    public function setImage($image): self
+    {
+        $this->image = $image;
+
+        return $this;
+    }
+
+    public function getImageWrapper(): ?object
+    {
+        return $this->imageWrapper;
+    }
+
+    public function setImageWrapper(?object $imageWrapper): self
+    {
+        $this->imageWrapper = $imageWrapper;
+
+        return $this;
+    }
+
+   
+
 }

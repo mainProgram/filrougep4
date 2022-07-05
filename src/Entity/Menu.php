@@ -9,6 +9,7 @@ use Doctrine\Common\Collections\Collection;
 use ApiPlatform\Core\Annotation\ApiResource;
 use Doctrine\Common\Collections\ArrayCollection;
 use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Validator\Constraints as Assert;
 use ApiPlatform\Core\Serializer\Filter\PropertyFilter;
 
 #[ORM\Entity(repositoryClass: MenuRepository::class)]
@@ -41,7 +42,9 @@ use ApiPlatform\Core\Serializer\Filter\PropertyFilter;
             "normalization_context" => [
                 "groups" => ["menu:detail", ]
             ]
-        ]
+        ],
+        "patch"
+
     ]
 )]
 #[ApiFilter(PropertyFilter::class)]
@@ -52,6 +55,7 @@ class Menu extends Produit
     private $frites;
 
     #[ORM\ManyToMany(targetEntity: Burger::class, inversedBy: 'menus')]
+    #[Assert\Count(['min' => 1], minMessage: "On doit avoir au minimum un burger !")]
     #[Groups(["menu:detail"])]
     private $burgers;
 

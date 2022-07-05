@@ -31,7 +31,8 @@ use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\NumericFilter;
             "security_message" => "Vous n'êtes pas autorisé !",
             "normalization_context" => [
                 "groups" => ["burger:detail"]
-            ]
+            ],
+            "deserialize" => false
         ],
         "addBurger" => [
             "status" => 201,

@@ -6,8 +6,9 @@ use App\Entity\Boisson;
 use App\Entity\Burger;
 use App\Entity\Frite;
 use App\Entity\Menu;
+use App\Entity\Produit;
+use Doctrine\Common\Proxy\Proxy;
 use Doctrine\ORM\Events;
-use Doctrine\ORM\Query\Expr\From;
 use Doctrine\Persistence\Event\LifecycleEventArgs;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
@@ -42,7 +43,8 @@ class UserSubscriber implements EventSubscriberInterface
     
     public function prePersist(LifecycleEventArgs $args)
     {
-        if ($args->getObject() instanceof Burger or $args->getObject() instanceof Menu  or $args->getObject() instanceof Frite  or $args->getObject() instanceof Boisson) {
+        if ($args->getObject() instanceof Burger or $args->getObject() instanceof Produit or $args->getObject() instanceof Menu  or $args->getObject() instanceof Frite  or $args->getObject() instanceof Boisson) 
+        {
             $args->getObject()->setUser($this->getUser());    
         }
     }

@@ -29,7 +29,8 @@ class UserDataPersister implements DataPersisterInterface
     
     public function supports($data): bool
     {
-        return $data instanceof User or $data instanceof Gestionnaire or  $data instanceof Client ;
+        return $data instanceof User ;
+        // return $data instanceof User or $data instanceof Gestionnaire or  $data instanceof Client ;
     }
 
 
