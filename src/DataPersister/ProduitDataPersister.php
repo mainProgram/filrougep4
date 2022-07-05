@@ -35,9 +35,9 @@ class ProduitDataPersister implements DataPersisterInterface
         elseif ($data instanceof Menu)
             $this->service->calculPrix($data);
 
-        $file = $data->getImageWrapper()->getRealPath();
-        $img = stream_get_contents(fopen($file, "rb"));
-        $data->setImage($img);
+        // $file = $data->getImageWrapper()->getRealPath();
+        // $img = stream_get_contents(fopen($file, "rb"));
+        // $data->setImage($img);
 
         $this->entityManager->persist($data);       
         $this->entityManager->flush();       

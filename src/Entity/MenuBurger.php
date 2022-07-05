@@ -5,10 +5,12 @@ namespace App\Entity;
 use Doctrine\ORM\Mapping as ORM;
 use App\Repository\MenuBurgerRepository;
 use Doctrine\Common\Collections\Collection;
+use ApiPlatform\Core\Annotation\ApiResource;
 use Doctrine\Common\Collections\ArrayCollection;
 use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\Entity(repositoryClass: MenuBurgerRepository::class)]
+#[ApiResource()]
 class MenuBurger
 {
     #[ORM\Id]
@@ -16,12 +18,12 @@ class MenuBurger
     #[ORM\Column(type: 'integer')]
     private $id;
 
-    // #[Groups(["menu:write"])]
+    #[Groups(["menu:write"])]
     #[ORM\Column(type: 'integer', nullable: true)]
     private $quantite;
 
     #[ORM\ManyToOne(targetEntity: Burger::class, inversedBy: 'menuBurgers')]
-    // #[Groups(["menu:write"])]
+    #[Groups(["menu:write"])]
     private $burger;
 
     #[ORM\ManyToOne(targetEntity: Menu::class, inversedBy: 'menuburgers')]

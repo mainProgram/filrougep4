@@ -4,9 +4,11 @@ namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 use App\Repository\MenuFriteRepository;
+use ApiPlatform\Core\Annotation\ApiResource;
 use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\Entity(repositoryClass: MenuFriteRepository::class)]
+#[ApiResource()]
 class MenuFrite
 {
     #[ORM\Id]
@@ -14,12 +16,12 @@ class MenuFrite
     #[ORM\Column(type: 'integer')]
     private $id;
 
-    // #[Groups(["menu:write"])]
+    #[Groups(["menu:write"])]
     #[ORM\Column(type: 'integer', nullable: true)]
     private $quantite;
 
     #[ORM\ManyToOne(targetEntity: Frite::class, inversedBy: 'menuFrites')]
-    // #[Groups(["menu:write"])]
+    #[Groups(["menu:write"])]
     private $frite;
 
     #[ORM\ManyToOne(targetEntity: Menu::class, inversedBy: 'menufrites')]

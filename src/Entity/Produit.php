@@ -57,7 +57,7 @@ class Produit
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: 'integer')]
-    #[Groups(["burger:detail", "burger:list"])]
+    #[Groups(["burger:detail", "burger:list", "menu:write"])]
     protected $id;
 
     #[Groups(["burger:detail", "burger:list", "menu:list", "menu:detail", "taille_boisson"])]

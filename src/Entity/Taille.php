@@ -17,6 +17,7 @@ class Taille
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: 'integer')]
+    #[Groups(["menu:write"])]
     private $id;
 
     #[ORM\Column(type: 'string', length: 20)]
@@ -26,14 +27,16 @@ class Taille
     #[ORM\OneToMany(targetEntity: TailleBoisson::class, mappedBy:"taille")]
     private $tailleBoissons;
 
-    #[ORM\ManyToMany(targetEntity: Menu::class, mappedBy: 'tailles')]
-    private $menus;
+    #[ORM\Column(type: 'integer', nullable: true)]
+    private $prix;
+
+    #[ORM\OneToMany(mappedBy: 'taille', targetEntity: MenuTaille::class)]
+    private $menuTailles;
 
     public function __construct()
     {
         $this->tailleBoissons = new ArrayCollection();
-        $this->menus = new ArrayCollection();
-
+        $this->menuTailles = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -74,30 +77,48 @@ class Taille
         return $this;
     }
 
+
+    public function getPrix(): ?int
+    {
+        return $this->prix;
+    }
+
+    public function setPrix(?int $prix): self
+    {
+        $this->prix = $prix;
+
+        return $this;
+    }
+
     /**
-     * @return Collection<int, Menu>
+     * @return Collection<int, MenuTaille>
      */
-    public function getMenus(): Collection
+    public function getMenuTailles(): Collection
     {
-        return $this->menus;
+        return $this->menuTailles;
     }
 
-    public function addMenu(Menu $menu): self
+    public function addMenuTaille(MenuTaille $menuTaille): self
     {
-        if (!$this->menus->contains($menu)) {
-            $this->menus[] = $menu;
-            $menu->addTaille($this);
+        if (!$this->menuTailles->contains($menuTaille)) {
+            $this->menuTailles[] = $menuTaille;
+            $menuTaille->setTaille($this);
         }
 
         return $this;
     }
 
-    public function removeMenu(Menu $menu): self
+    public function removeMenuTaille(MenuTaille $menuTaille): self
     {
-        if ($this->menus->removeElement($menu)) {
-            $menu->removeTaille($this);
+        if ($this->menuTailles->removeElement($menuTaille)) {
+            // set the owning side to null (unless already changed)
+            if ($menuTaille->getTaille() === $this) {
+                $menuTaille->setTaille(null);
+            }
         }
 
         return $this;
     }
+
+    
 }
