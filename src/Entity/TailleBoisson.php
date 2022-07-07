@@ -8,6 +8,7 @@ use App\Entity\Boisson;
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\Common\Collections\Collection;
 use ApiPlatform\Core\Annotation\ApiResource;
+use Symfony\Component\Validator\Constraints as Assert;
 use Doctrine\Common\Collections\ArrayCollection;
 use Symfony\Component\Serializer\Annotation\Groups;
 
@@ -34,17 +35,21 @@ class TailleBoisson
     #[ORM\Column(type: 'integer')]
     private $id;
 
-    #[Groups(["taille_boisson"])]
+    #[Groups(["boisson:write", "taille_boisson"])]
     #[ORM\Column(type: 'float')]
     private $prix;
 
-    #[Groups(["taille_boisson", "menu:detail"])]
-    #[ORM\ManyToOne(targetEntity: Boisson::class, inversedBy: "tailleBoissons")]
-    private $boisson;
+    #[Assert\Positive(message: "La quantité doit être supérieure à 0 !")]
+    #[Groups(["boisson:write"])]
+    #[ORM\Column(type: 'integer', nullable: true)]
+    private $quantiteStock;
 
-    #[Groups(["taille_boisson", "menu:detail"])]
-    #[ORM\ManyToOne(targetEntity: Taille::class, inversedBy: "tailleBoissons")]
+    #[Groups(["boisson:write"])]
+    #[ORM\ManyToOne(targetEntity: Taille::class, inversedBy: 'tailleBoissons')]
     private $taille;
+
+    #[ORM\ManyToOne(targetEntity: Boisson::class, inversedBy: 'tailleBoissons')]
+    private $boisson;
 
     public function __construct()
     {
@@ -79,72 +84,41 @@ class TailleBoisson
         return $this;
     }
 
-    /**
-     * Get the value of boisson
-     */ 
-    public function getBoisson()
+    public function getQuantiteStock(): ?int
     {
-        return $this->boisson;
+        return $this->quantiteStock;
     }
 
-    /**
-     * Set the value of boisson
-     *
-     * @return  self
-     */ 
-    public function setBoisson($boisson)
+    public function setQuantiteStock(?int $quantiteStock): self
     {
-        $this->boisson = $boisson;
+        $this->quantiteStock = $quantiteStock;
 
         return $this;
     }
 
-    /**
-     * Get the value of taille
-     */ 
-    public function getTaille()
+    public function getTaille(): ?Taille
     {
         return $this->taille;
     }
 
-    /**
-     * Set the value of taille
-     *
-     * @return  self
-     */ 
-    public function setTaille($taille)
+    public function setTaille(?Taille $taille): self
     {
         $this->taille = $taille;
 
         return $this;
     }
 
-    // /**
-    //  * @return Collection<int, Menu>
-    //  */
-    // public function getMenus(): Collection
-    // {
-    //     return $this->menus;
-    // }
+    public function getBoisson(): ?Boisson
+    {
+        return $this->boisson;
+    }
 
-    // public function addMenu(Menu $menu): self
-    // {
-    //     if (!$this->menus->contains($menu)) {
-    //         $this->menus[] = $menu;
-    //         $menu->addTailleBoisson($this);
-    //     }
+    public function setBoisson(?Boisson $boisson): self
+    {
+        $this->boisson = $boisson;
 
-    //     return $this;
-    // }
-
-    // public function removeMenu(Menu $menu): self
-    // {
-    //     if ($this->menus->removeElement($menu)) {
-    //         $menu->removeTailleBoisson($this);
-    //     }
-
-    //     return $this;
-    // }
+        return $this;
+    }
 
 
    

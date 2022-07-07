@@ -12,6 +12,15 @@ use Symfony\Component\Validator\Constraints as Assert;
 #[ApiResource(
     security : "is_granted('ROLE_GESTIONNAIRE')",
     securityMessage : "Vous n'êtes pas autorisé !",
+    collectionOperations: [
+        "get" => [
+            "normalization_context" => [
+                "groups" => [
+                    "quartier:list"
+                ]  
+            ]
+        ]
+    ]
 )]
 class Quartier
 {
@@ -22,7 +31,7 @@ class Quartier
 
     #[Assert\NotBlank(message: "Ce champ est requis !")]
     #[ORM\Column(type: 'string', length: 50, unique: true)]
-    #[Groups(["zone:list"])]
+    #[Groups(["zone:list", "quartier:list" ])]
     private $nom;
 
     #[ORM\Column(type: 'boolean')]

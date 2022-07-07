@@ -29,11 +29,14 @@ class ProduitDataPersister implements DataPersisterInterface
 
     public function persist($data)
     {
-        // dd($data);
+
         if($data instanceof Boisson)
             $data->setPrix((0));
         elseif ($data instanceof Menu)
             $this->service->calculPrix($data);
+
+        // $file = $data->getImageWrapper();
+        // $img = file_get_contents($file);
 
         // $file = $data->getImageWrapper()->getRealPath();
         // $img = stream_get_contents(fopen($file, "rb"));
@@ -47,16 +50,18 @@ class ProduitDataPersister implements DataPersisterInterface
 
     public function remove($data)
     {
+        // dd($data->getMenuBurgers()[0]->getBurger());
         if($data instanceof Burger)
         {
             if( $data->isIsEtat())
             {
-                if(count($data->getMenus()) == 0){
+                if(count($data->getMenuBurgers()) == 0){
                     $data->setIsEtat(false);
+                    // dd("false etat");    
                 }
                 else{
-                    foreach($data->getMenus() as $m){
-                        $m->removeBurger($data);
+                    foreach($data->getMenuBurgers() as $m){
+                        $data->removeMenuBurger($m);
                     }
                     // dd("Ce burger se trouve dans un menu !");    
                 }

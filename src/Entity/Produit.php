@@ -57,34 +57,34 @@ class Produit
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: 'integer')]
-    #[Groups(["burger:detail", "burger:list", "menu:write"])]
+    #[Groups(["produit:detail", "burger:list", "menu:write"])]
     protected $id;
 
-    #[Groups(["burger:detail", "burger:list", "menu:list", "menu:detail", "taille_boisson"])]
+    #[Groups(["produit:detail", "produit:list", "menu:detail", "taille_boisson", "boisson:write", "commande:list"])]
     #[ORM\Column(type: 'string', length: 50, unique: true)]
     #[Assert\NotBlank(message: "Ce champ est requis !")]
     protected $nom;
 
-    #[Groups(["burger:detail", "burger:list", "menu:list"])]
+    #[Groups(["produit:detail", "produit:list"])]
     // #[Assert\NotBlank(message: "Ce champ est requis !")]
     // #[Assert\Positive(message: "Le prix doit être supérieur à 0 !")]
     #[ORM\Column(type: 'float', nullable: true)]
     protected $prix;
 
-    #[Groups(["burger:detail", "menu:detail"])]
+    #[Groups(["produit:detail", "menu:detail"])]
     #[ORM\Column(type: 'boolean')]
     protected $isEtat = 1;
 
-    #[Groups(["burger:detail"])]
+    #[Groups(["produit:detail"])]
     #[ORM\Column(type: 'string', length: 255)]
     protected $detail = "";
 
-    #[Groups(["burger:detail"])]
     #[ORM\ManyToOne(targetEntity: User::class, inversedBy: 'produits')]
     #[ORM\JoinColumn(nullable: false)]
     protected $user;
 
     #[ORM\Column(type: 'blob', nullable: true)]
+    #[Groups(["produit:list", "produit:detail"])]
     protected $image;
 
     // #[ORM\Column(type: 'object', nullable: true)]

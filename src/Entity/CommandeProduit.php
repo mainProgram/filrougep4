@@ -2,8 +2,9 @@
 
 namespace App\Entity;
 
-use App\Repository\CommandeProduitRepository;
 use Doctrine\ORM\Mapping as ORM;
+use App\Repository\CommandeProduitRepository;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\Entity(repositoryClass: CommandeProduitRepository::class)]
 class CommandeProduit
@@ -13,12 +14,14 @@ class CommandeProduit
     #[ORM\Column(type: 'integer')]
     private $id;
 
+    #[Groups(["commande:list"])]
     #[ORM\Column(type: 'integer', nullable: true)]
     private $quantite;
 
     #[ORM\Column(type: 'float', nullable: true)]
     private $prix;
 
+    #[Groups(["commande:list"])]
     #[ORM\ManyToOne(targetEntity: Produit::class, inversedBy: 'commandeProduits')]
     private $produit;
 

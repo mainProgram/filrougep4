@@ -24,19 +24,19 @@ class Taille
     #[Groups(["taille_boisson", "menu:detail"])]
     private $nom;
 
-    #[ORM\OneToMany(targetEntity: TailleBoisson::class, mappedBy:"taille")]
-    private $tailleBoissons;
-
     #[ORM\Column(type: 'integer', nullable: true)]
     private $prix;
 
     #[ORM\OneToMany(mappedBy: 'taille', targetEntity: MenuTaille::class)]
     private $menuTailles;
 
+    #[ORM\OneToMany(mappedBy: 'taille', targetEntity: TailleBoisson::class)]
+    private $tailleBoissons;
+
     public function __construct()
     {
-        $this->tailleBoissons = new ArrayCollection();
         $this->menuTailles = new ArrayCollection();
+        $this->tailleBoissons = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -55,28 +55,6 @@ class Taille
 
         return $this;
     }
-
-
-    /**
-     * Get the value of tailleBoissons
-     */ 
-    public function getTailleBoissons()
-    {
-        return $this->tailleBoissons;
-    }
-
-    /**
-     * Set the value of tailleBoissons
-     *
-     * @return  self
-     */ 
-    public function setTailleBoissons($tailleBoissons)
-    {
-        $this->tailleBoissons = $tailleBoissons;
-
-        return $this;
-    }
-
 
     public function getPrix(): ?int
     {
@@ -114,6 +92,36 @@ class Taille
             // set the owning side to null (unless already changed)
             if ($menuTaille->getTaille() === $this) {
                 $menuTaille->setTaille(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, TailleBoisson>
+     */
+    public function getTailleBoissons(): Collection
+    {
+        return $this->tailleBoissons;
+    }
+
+    public function addTailleBoisson(TailleBoisson $tailleBoisson): self
+    {
+        if (!$this->tailleBoissons->contains($tailleBoisson)) {
+            $this->tailleBoissons[] = $tailleBoisson;
+            $tailleBoisson->setTaille($this);
+        }
+
+        return $this;
+    }
+
+    public function removeTailleBoisson(TailleBoisson $tailleBoisson): self
+    {
+        if ($this->tailleBoissons->removeElement($tailleBoisson)) {
+            // set the owning side to null (unless already changed)
+            if ($tailleBoisson->getTaille() === $this) {
+                $tailleBoisson->setTaille(null);
             }
         }
 

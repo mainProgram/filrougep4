@@ -7,6 +7,7 @@ use App\Repository\MenuBurgerRepository;
 use Doctrine\Common\Collections\Collection;
 use ApiPlatform\Core\Annotation\ApiResource;
 use Doctrine\Common\Collections\ArrayCollection;
+use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\Entity(repositoryClass: MenuBurgerRepository::class)]
@@ -19,14 +20,16 @@ class MenuBurger
     private $id;
 
     #[Groups(["menu:write"])]
+    #[Assert\Positive(message: "La quantité doit être supérieure à 0 !")]
     #[ORM\Column(type: 'integer', nullable: true)]
-    private $quantite;
+    private $quantite = 1;
 
     #[ORM\ManyToOne(targetEntity: Burger::class, inversedBy: 'menuBurgers')]
     #[Groups(["menu:write"])]
     private $burger;
 
-    #[ORM\ManyToOne(targetEntity: Menu::class, inversedBy: 'menuburgers')]
+    #[Groups(["menu:write"])]
+    #[ORM\ManyToOne(targetEntity: Menu::class, inversedBy: 'menuBurgers')]
     private $menu;
 
    

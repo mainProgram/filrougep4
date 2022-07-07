@@ -32,3 +32,10 @@ services:
                 name: 'doctrine.orm.entity_listener'
                 event: 'postUpdate'
                 entity: 'App\Entity\User'
+    App\EventSubscriber\CommandeSubscriber:
+        tags:
+            -
+                # these are the options required to define the entity listener
+                name: 'doctrine.orm.entity_listener'
+                event: 'postUpdate'
+                entity: 'App\Entity\Commande'

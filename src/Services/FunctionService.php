@@ -11,14 +11,14 @@ class FunctionService
     {
         $prix = 0;
 
-        // foreach($data->getBurgers() as $burger)
-        //     $prix+= $burger->getPrix();
+        foreach($data->getMenuburgers() as $burger)
+            $prix+= $burger->getBurger()->getPrix() * $burger->getQuantite();
 
-        // foreach($data->getFrites() as $frite)
-        //     $prix+= $frite->getPrix();
+        foreach($data->getMenufrites() as $frite)
+            $prix+= $frite->getFrite()->getPrix() * $frite->getQuantite();
 
-        // foreach($data->getTailleBoissons() as $boisson)
-        //     $prix+= $boisson->getPrix();
+        foreach($data->getMenuTailles() as $boisson)
+            $prix+= $boisson->getTaille()->getPrix() * $boisson->getQuantite();
 
         $prix -= $prix * 0.05;
         $data->setPrix($prix);

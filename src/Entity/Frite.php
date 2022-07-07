@@ -18,7 +18,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
             "security" => "is_granted('ROLE_GESTIONNAIRE')",
             "security_message" => "Vous n'êtes pas autorisé !",
             "normalization_context" => [
-                "groups" => ["burger:list"]
+                "groups" => ["produit:list"]
             ]
         ],
         "post" => [
@@ -27,7 +27,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
             "security" => "is_granted('ROLE_GESTIONNAIRE')",
             "security_message" => "Vous n'êtes pas autorisé !",
             "normalization_context" => [
-                "groups" => ["burger:detail"]
+                "groups" => ["produit:detail"]
             ],
            
             
@@ -38,7 +38,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
             "method" => "get",
             "status" => 200,
             "normalization_context" => [
-                "groups" => ["burger:detail"]
+                "groups" => ["produit:detail"]
             ]
         ],
         "delete" => [

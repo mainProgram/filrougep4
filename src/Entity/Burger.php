@@ -21,7 +21,7 @@ use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\NumericFilter;
             "security" => "is_granted('ROLE_GESTIONNAIRE')",
             "security_message" => "Vous n'êtes pas autorisé !",
             "normalization_context" => [
-                "groups" => ["burger:list"]
+                "groups" => ["produit:list"]
             ]
         ],
         "post" => [
@@ -32,23 +32,23 @@ use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\NumericFilter;
             "normalization_context" => [
                 "groups" => ["burger:detail"]
             ],
-            "deserialize" => false
+            // "deserialize" => false
         ],
-        "addBurger" => [
-            "status" => 201,
-            "method" => "post",
-            "security" => "is_granted('ROLE_GESTIONNAIRE')",
-            "security_message" => "Vous n'êtes pas autorisé !",
-            "path" => "/addBurger",
-            "controller" => BurgerController::class
-        ]
+        // "addBurger" => [
+        //     "status" => 201,
+        //     "method" => "post",
+        //     "security" => "is_granted('ROLE_GESTIONNAIRE')",
+        //     "security_message" => "Vous n'êtes pas autorisé !",
+        //     "path" => "/addBurger",
+        //     "controller" => BurgerController::class
+        // ]
     ],
     itemOperations: [
         "get" => [
             "method" => "get",
             "status" => 200,
             "normalization_context" => [
-                "groups" => ["burger:detail"]
+                "groups" => ["produit:detail"]
             ]
         ],
         "delete" => [

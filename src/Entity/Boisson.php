@@ -2,11 +2,12 @@
 
 namespace App\Entity;
 
-use ApiPlatform\Core\Annotation\ApiResource;
-use App\Repository\BoissonRepository;
-use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use App\Repository\BoissonRepository;
+use Doctrine\Common\Collections\Collection;
+use ApiPlatform\Core\Annotation\ApiResource;
+use Doctrine\Common\Collections\ArrayCollection;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\Entity(repositoryClass: BoissonRepository::class)]
 #[ApiResource(
@@ -17,7 +18,7 @@ use Doctrine\ORM\Mapping as ORM;
             "security" => "is_granted('ROLE_GESTIONNAIRE')",
             "security_message" => "Vous n'êtes pas autorisé !",
             "normalization_context" => [
-                "groups" => ["burger:list"]
+                "groups" => ["produit:list"]
             ]
         ],
         "post" => [
@@ -26,7 +27,10 @@ use Doctrine\ORM\Mapping as ORM;
             "security" => "is_granted('ROLE_GESTIONNAIRE')",
             "security_message" => "Vous n'êtes pas autorisé !",
             "normalization_context" => [
-                "groups" => ["burger:detail"]
+                "groups" => ["produit:detail"]
+            ],
+            "denormalization_context" => [
+                "groups" => ["boisson:write"]
             ]
         ],
     ],
@@ -50,36 +54,51 @@ use Doctrine\ORM\Mapping as ORM;
         ]
     ]
 )]
+
 class Boisson extends Produit
 {
 
-    #[ORM\OneToMany(targetEntity: TailleBoisson::class, mappedBy: 'boisson')]
+  
+
+    #[ORM\OneToMany(mappedBy: 'boisson', targetEntity: TailleBoisson::class, cascade: ["persist"])]
+    #[Groups(["boisson:write"])]
     private $tailleBoissons;
 
     public function __construct()
     {
         parent::__construct();
         $this->tailleBoissons = new ArrayCollection();
-        $this->menus = new ArrayCollection();
     }
 
     /**
-     * Get the value of tailleBoissons
-     */ 
-    public function getTailleBoissons()
+     * @return Collection<int, TailleBoisson>
+     */
+    public function getTailleBoissons(): Collection
     {
         return $this->tailleBoissons;
     }
 
-    /**
-     * Set the value of tailleBoissons
-     *
-     * @return  self
-     */ 
-    public function setTailleBoissons($tailleBoissons)
+    public function addTailleBoisson(TailleBoisson $tailleBoisson): self
     {
-        $this->tailleBoissons = $tailleBoissons;
+        if (!$this->tailleBoissons->contains($tailleBoisson)) {
+            $this->tailleBoissons[] = $tailleBoisson;
+            $tailleBoisson->setBoisson($this);
+        }
 
         return $this;
     }
+
+    public function removeTailleBoisson(TailleBoisson $tailleBoisson): self
+    {
+        if ($this->tailleBoissons->removeElement($tailleBoisson)) {
+            // set the owning side to null (unless already changed)
+            if ($tailleBoisson->getBoisson() === $this) {
+                $tailleBoisson->setBoisson(null);
+            }
+        }
+
+        return $this;
+    }
+
+ 
 }

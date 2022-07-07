@@ -2,7 +2,11 @@
 
 namespace App\Entity;
 
+use App\Entity\Frite;
+use App\Entity\Burger;
+use App\Entity\Taille;
 use Doctrine\ORM\Mapping as ORM;
+use App\Controller\MenuController;
 use App\Repository\MenuRepository;
 use ApiPlatform\Core\Annotation\ApiFilter;
 use Doctrine\Common\Collections\Collection;
@@ -10,8 +14,8 @@ use ApiPlatform\Core\Annotation\ApiResource;
 use ApiPlatform\Core\Annotation\ApiSubresource;
 use Doctrine\Common\Collections\ArrayCollection;
 use Symfony\Component\Serializer\Annotation\Groups;
-use Symfony\Component\Validator\Constraints as Assert;
 use ApiPlatform\Core\Serializer\Filter\PropertyFilter;
+use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Serializer\Annotation\SerializedName;
 
 #[ORM\Entity(repositoryClass: MenuRepository::class)]
@@ -21,7 +25,7 @@ use Symfony\Component\Serializer\Annotation\SerializedName;
             "security" => "is_granted('ROLE_GESTIONNAIRE')",
             "security_message" => "Vous n'êtes pas autorisé !",
             "normalization_context" => [
-                "groups" => ["menu:list"]
+                "groups" => ["produit:list"]
             ]
         ],
         "post" => [
@@ -31,8 +35,19 @@ use Symfony\Component\Serializer\Annotation\SerializedName;
             "security_message" => "Vous n'êtes pas autorisé !",
             "denormalization_context" => [
                 "groups" => ["menu:write"]
-            ],
-               
+            ],   
+        ],
+        "addMenu" => [
+            "method" => "post",
+            "deserialize" => false,
+            "status" => 201,
+            "security" => "is_granted('ROLE_GESTIONNAIRE')",
+            "security_message" => "Vous n'êtes pas autorisé !",
+            "controller" => MenuController::class,
+            "path" => "/addMenu",
+            // "denormalization_context" => [
+            //     "groups" => ["menu:write"]
+            // ],  
         ]
     ],
     itemOperations:[
@@ -47,7 +62,7 @@ use Symfony\Component\Serializer\Annotation\SerializedName;
         ],
         "get" => [
             "normalization_context" => [
-                "groups" => ["menu:detail", ]
+                "groups" => ["produit:detail"]
             ]
         ],
         "patch"
@@ -59,18 +74,21 @@ class Menu extends Produit
 {
 
     #[Groups(["menu:write"])]
+    // #[Assert\NotBlank(message: "Ce champ est requis !")]
     protected $nom;
 
     // #[Groups(["menu:write"])]
-    protected $image;
+    // #[Assert\NotBlank(message: "Ce champ est requis !")]
+    #[SerializedName("image")]
+    protected $imageWrapper;
 
     #[Groups(["menu:write"])]
     #[ORM\OneToMany(mappedBy: 'menu', targetEntity: MenuFrite::class, cascade: ["persist"])]
-    private $menufrites;
+    private $menuFrites;
 
     #[Groups(["menu:write"])]
     #[ORM\OneToMany(mappedBy: 'menu', targetEntity: MenuBurger::class, cascade: ["persist"])]
-    private $menuburgers;
+    private $menuBurgers;
 
     #[Groups(["menu:write"])]
     #[ORM\OneToMany(mappedBy: 'menu', targetEntity: MenuTaille::class, cascade: ["persist"])]
@@ -79,8 +97,8 @@ class Menu extends Produit
     public function __construct()
     {
         parent::__construct();
-        $this->menufrites = new ArrayCollection();
-        $this->menuburgers = new ArrayCollection();
+        $this->menuFrites = new ArrayCollection();
+        $this->menuBurgers = new ArrayCollection();
         $this->menuTailles = new ArrayCollection();
     }
   
@@ -90,13 +108,13 @@ class Menu extends Produit
      */
     public function getMenufrites(): Collection
     {
-        return $this->menufrites;
+        return $this->menuFrites;
     }
 
     public function addMenufrite(MenuFrite $menufrite): self
     {
-        if (!$this->menufrites->contains($menufrite)) {
-            $this->menufrites[] = $menufrite;
+        if (!$this->menuFrites->contains($menufrite)) {
+            $this->menuFrites[] = $menufrite;
             $menufrite->setMenu($this);
         }
 
@@ -105,7 +123,7 @@ class Menu extends Produit
 
     public function removeMenufrite(MenuFrite $menufrite): self
     {
-        if ($this->menufrites->removeElement($menufrite)) {
+        if ($this->menuFrites->removeElement($menufrite)) {
             // set the owning side to null (unless already changed)
             if ($menufrite->getMenu() === $this) {
                 $menufrite->setMenu(null);
@@ -115,18 +133,41 @@ class Menu extends Produit
         return $this;
     }
 
+
+    public function addFrite(Frite $frite, int $quantite)
+    {
+        $menufrite = new MenuFrite();
+
+        $menufrite->setQuantite($quantite);
+        $menufrite->setFrite($frite);
+        $menufrite->setMenu($this);
+
+        $this->addMenuFrite($menufrite);
+    }
+
+    public function addBurger(Burger $burger, int $quantite)
+    {
+        $menuBurger = new MenuBurger();
+
+        $menuBurger->setQuantite($quantite);
+        $menuBurger->setBurger($burger);
+        $menuBurger->setMenu($this);
+
+        $this->addMenuburger($menuBurger);
+    }
+
     /**
      * @return Collection<int, MenuBurger>
      */
     public function getMenuburgers(): Collection
     {
-        return $this->menuburgers;
+        return $this->menuBurgers;
     }
 
     public function addMenuburger(MenuBurger $menuburger): self
     {
-        if (!$this->menuburgers->contains($menuburger)) {
-            $this->menuburgers[] = $menuburger;
+        if (!$this->menuBurgers->contains($menuburger)) {
+            $this->menuBurgers[] = $menuburger;
             $menuburger->setMenu($this);
         }
 
@@ -135,7 +176,7 @@ class Menu extends Produit
 
     public function removeMenuburger(MenuBurger $menuburger): self
     {
-        if ($this->menuburgers->removeElement($menuburger)) {
+        if ($this->menuBurgers->removeElement($menuburger)) {
             // set the owning side to null (unless already changed)
             if ($menuburger->getMenu() === $this) {
                 $menuburger->setMenu(null);
@@ -176,6 +217,15 @@ class Menu extends Produit
     }
 
     
+    public function addTaille(Taille $taille, int $quantite)
+    {
+        $menutaille = new MenuTaille();
 
+        $menutaille->setQuantite($quantite);
+        $menutaille->setTaille($taille);
+        $menutaille->setMenu($this);
+
+        $this->addMenuTaille($menutaille);
+    }
    
 }

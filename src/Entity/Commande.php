@@ -14,9 +14,15 @@ use Symfony\Component\Serializer\Annotation\SerializedName;
 #[ApiResource(
     collectionOperations:[
         "post" => [
-            "denormalization_context" =>[
+            "method" => "post",
+            "status" => 201,
+        ],
+        "get" => [
+            "method" => "get",
+            "status" => 200,
+            "normalization_context" => [
                 "groups" => [
-                    "commande:write"
+                    "commande:list"
                 ]
             ]
         ]
@@ -30,6 +36,7 @@ class Commande
     private $id;
 
     #[ORM\ManyToOne(targetEntity: Client::class, inversedBy: 'commandes')]
+    #[Groups(["commande:list"])]
     private $client;
 
     #[ORM\ManyToOne(targetEntity: Livraison::class, inversedBy: 'commandes')]
@@ -43,18 +50,23 @@ class Commande
 
     #[ORM\OneToOne(targetEntity: Ticket::class, cascade: ['persist', 'remove'])]
     private $ticket;
-
-    // #[SerializedName("produits")]
-
-
+    
+    #[Groups(["commande:list"])]
     #[ORM\Column(type: 'string', length: 10)]
-    private $etat = "";
-
+    private $etat = "En attente";
+    
+    #[Groups(["commande:list"])]
     #[ORM\Column(type: 'boolean', nullable: true)]
     private $paye;
-
-    #[ORM\OneToMany(mappedBy: 'commande', targetEntity: CommandeProduit::class)]
+    
+    #[Groups(["commande:list"])]
+    // #[SerializedName("produits")]
+    #[ORM\OneToMany(mappedBy: 'commande', targetEntity: CommandeProduit::class, cascade: ["persist"])]
     private $commandeProduits;
+
+    #[Groups(["commande:list"])]
+    #[ORM\Column(type: 'float', nullable: true)]
+    private $prix;
 
     public function __construct()
     {
@@ -126,8 +138,6 @@ class Commande
         return $this;
     }
 
-   
-
     public function getEtat(): ?string
     {
         return $this->etat;
@@ -178,6 +188,18 @@ class Commande
                 $commandeProduit->setCommande(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getPrix(): ?float
+    {
+        return $this->prix;
+    }
+
+    public function setPrix(?float $prix): self
+    {
+        $this->prix = $prix;
 
         return $this;
     }
