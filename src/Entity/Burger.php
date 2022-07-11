@@ -24,16 +24,20 @@ use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\NumericFilter;
                 "groups" => ["produit:list"]
             ]
         ],
-        "post" => [
-            "status" => 201,
-            "method" => "post",
-            "security" => "is_granted('ROLE_GESTIONNAIRE')",
-            "security_message" => "Vous n'êtes pas autorisé !",
-            "normalization_context" => [
-                "groups" => ["burger:detail"]
-            ],
-            // "deserialize" => false
+        "post" => [ 
+            "security_post_denormalize" => "is_granted('BURGER_CREATE', object)",
+            "security_post_denormalize_message" => "Access dentzbgnukjm" 
         ],
+        // "post" => [
+        //     "status" => 201,
+        //     "method" => "post",
+        //     "security" => "is_granted('ROLE_GESTIONNAIRE')",
+        //     "security_message" => "Vous n'êtes pas autorisé !",
+        //     "normalization_context" => [
+        //         "groups" => ["burger:detail"]
+        //     ],
+        //     // "deserialize" => false
+        // ],
         // "addBurger" => [
         //     "status" => 201,
         //     "method" => "post",
