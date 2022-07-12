@@ -7,7 +7,6 @@ use App\Controller\MailController;
 use App\Repository\UserRepository;
 use Doctrine\Common\Collections\Collection;
 use ApiPlatform\Core\Annotation\ApiResource;
-use ApiPlatform\Core\Annotation\ApiSubresource;
 use Doctrine\Common\Collections\ArrayCollection;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
@@ -26,6 +25,11 @@ use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
             "path" => "/users/validate/{token}",
             "controller" => MailController::class
         ]
+    ],
+    itemOperations: [
+        "get" => [
+            "openapi_context" => ["summary"=>"hidden"]
+        ]
     ]
 )]
 class User implements UserInterface, PasswordAuthenticatedUserInterface
@@ -37,33 +41,45 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     protected $id;
 
     #[ORM\Column(type: 'string', length: 180, unique: true)]
-    // #[Assert\NotBlank(message: "Ce champ est requis !")]
-    #[Groups("burger:detail")]
+    #[Assert\Email(message: "Ce addresse mail est invalide !")]
+    #[Groups(["burger:detail", "sign_up:write", "sign_up:read"])]
     protected $email;
 
     #[ORM\Column(type: 'json')]
     protected $roles = [];
 
-    #[Assert\NotBlank(message: "Ce champ est requis !")]
+    #[Groups(["sign_up:write"])]
+    #[Assert\Length(min: 8, minMessage: "Votre mot de passe doit avoir minimum 8 caractères !")]
+    #[Assert\Regex(pattern:"/^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{6,}$/", message: "Password should contain at least a letter and number and its length > 6 characters !")]
     #[ORM\Column(type: 'string')]
     protected $password;
 
     #[Assert\NotBlank(message: "Ce champ est requis !")]
+    #[Assert\EqualTo(propertyPath:"password", message: "Les deux mots de passes se sont pas identiques !")]
+    #[Groups(["sign_up:write"])]
+    protected $confirmPassword;
+
+    #[Groups(["sign_up:write", "sign_up:read"])]
+    #[Assert\Length(min:2, minMessage: "Nom invalide !")]
     #[ORM\Column(type: 'string', length: 40)]
     protected $nom;
 
-    #[Assert\NotBlank(message: "Ce champ est requis !")]
+    #[Groups(["sign_up:write", "sign_up:read"])]
+    #[Assert\Length(min:2, minMessage: "Prénom invalide !")]
+    #[Assert\Regex(pattern:"/^[a-zA-ZàáâäãåąčćęèéêëėįìíîïłńòóôöõøùúûüųūÿýżźñçčšžÀÁÂÄÃÅĄĆČĖĘÈÉÊËÌÍÎÏĮŁŃÒÓÔÖÕØÙÚÛÜŲŪŸÝŻŹÑßÇŒÆČŠŽ∂ð ,.'-]+$/u", message: "Nom invalide !")]
     #[ORM\Column(type: 'string', length: 40)]
     protected $prenom;
 
-    #[Assert\NotBlank(message: "Ce champ est requis !")]
+    #[Groups(["sign_up:write", "sign_up:read"])]
+    #[Assert\Length(min:9, minMessage: "Longueur invalide !")]
+    #[Assert\Regex(pattern:"/^(77|78|75|76|70|33)[0-9]{7}$/", message: "Numéro non valide !")]
     #[ORM\Column(type: 'string', length: 30)]
     protected $telephone;
 
     #[ORM\Column(type: 'boolean')]
     protected $isEtat = true;
 
-    #[ApiSubresource()]
+    // #[ApiSubresource()]
     #[ORM\OneToMany(mappedBy: 'user', targetEntity: Produit::class)]
     protected $produits;
 
@@ -282,5 +298,25 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function generateToken(){
         $this->expiredAt = new \Datetime("+1 day");
         $this->token = bin2hex(openssl_random_pseudo_bytes(16));
+    }
+
+    /**
+     * Get the value of confirmPassword
+     */ 
+    public function getConfirmPassword()
+    {
+        return $this->confirmPassword;
+    }
+
+    /**
+     * Set the value of confirmPassword
+     *
+     * @return  self
+     */ 
+    public function setConfirmPassword($confirmPassword)
+    {
+        $this->confirmPassword = $confirmPassword;
+
+        return $this;
     }
 }

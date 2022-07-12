@@ -14,9 +14,16 @@ use ApiPlatform\Core\Annotation\ApiResource;
         "sign_up" => [
             "method" => "post",
             "status" => 201,
-            "path" => "/sign_up"
+            "path" => "/sign_up",
+            "denormalization_context" => [ "groups" => ["sign_up:write"]],
+            "normalization_context" => ["groups" => ["sign_up:read"]]
         ]
-    ]          
+        ],
+    itemOperations:[
+        "get" => [
+            "openapi_context" => ["summary"=>"hidden"]
+        ]
+    ] 
 )]
 class Client extends User
 {
