@@ -62,13 +62,6 @@ class Commande
     #[Groups(["commande:list"])]
     #[ORM\Column(type: 'boolean', nullable: true)]
     private $paye;
-    
-    #[Groups(["commande:list"])]
-    // #[SerializedName("produits")]
-    #[Assert\Valid()]
-    #[Assert\Count(min:1, minMessage:"Renseignez un burger ou un menu !")]
-    #[ORM\OneToMany(mappedBy: 'commande', targetEntity: CommandeProduit::class, cascade: ["persist"])]
-    private $commandeProduits;
 
     #[Groups(["commande:list"])]
     #[ORM\Column(type: 'float', nullable: true)]
@@ -86,13 +79,24 @@ class Commande
     #[ORM\Column(type: 'string', length: 255, nullable: true)]
     private $numero;
 
+    #[ORM\OneToMany(mappedBy: 'commande', targetEntity: CommandeMenu::class)]
+    private $commandeMenus;
+
+    #[ORM\OneToMany(mappedBy: 'commande', targetEntity: CommandeFrite::class)]
+    private $commandeFrites;
+
+    #[ORM\OneToMany(mappedBy: 'commande', targetEntity: CommandeBurger::class)]
+    private $commandeBurgers;
+
   
 
     public function __construct()
     {
         $this->date = new \DateTime(); 
-        $this->commandeProduits = new ArrayCollection();
         $this->commandeTailleBoissons = new ArrayCollection();
+        $this->commandeMenus = new ArrayCollection();
+        $this->commandeFrites = new ArrayCollection();
+        $this->commandeBurgers = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -184,36 +188,6 @@ class Commande
         return $this;
     }
 
-    /**
-     * @return Collection<int, CommandeProduit>
-     */
-    public function getCommandeProduits(): Collection
-    {
-        return $this->commandeProduits;
-    }
-
-    public function addCommandeProduit(CommandeProduit $commandeProduit): self
-    {
-        if (!$this->commandeProduits->contains($commandeProduit)) {
-            $this->commandeProduits[] = $commandeProduit;
-            $commandeProduit->setCommande($this);
-        }
-
-        return $this;
-    }
-
-    public function removeCommandeProduit(CommandeProduit $commandeProduit): self
-    {
-        if ($this->commandeProduits->removeElement($commandeProduit)) {
-            // set the owning side to null (unless already changed)
-            if ($commandeProduit->getCommande() === $this) {
-                $commandeProduit->setCommande(null);
-            }
-        }
-
-        return $this;
-    }
-
     public function getPrix(): ?float
     {
         return $this->prix;
@@ -276,6 +250,96 @@ class Commande
     public function setNumero(?string $numero): self
     {
         $this->numero = $numero;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, CommandeMenu>
+     */
+    public function getCommandeMenus(): Collection
+    {
+        return $this->commandeMenus;
+    }
+
+    public function addCommandeMenu(CommandeMenu $commandeMenu): self
+    {
+        if (!$this->commandeMenus->contains($commandeMenu)) {
+            $this->commandeMenus[] = $commandeMenu;
+            $commandeMenu->setCommande($this);
+        }
+
+        return $this;
+    }
+
+    public function removeCommandeMenu(CommandeMenu $commandeMenu): self
+    {
+        if ($this->commandeMenus->removeElement($commandeMenu)) {
+            // set the owning side to null (unless already changed)
+            if ($commandeMenu->getCommande() === $this) {
+                $commandeMenu->setCommande(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, CommandeFrite>
+     */
+    public function getCommandeFrites(): Collection
+    {
+        return $this->commandeFrites;
+    }
+
+    public function addCommandeFrite(CommandeFrite $commandeFrite): self
+    {
+        if (!$this->commandeFrites->contains($commandeFrite)) {
+            $this->commandeFrites[] = $commandeFrite;
+            $commandeFrite->setCommande($this);
+        }
+
+        return $this;
+    }
+
+    public function removeCommandeFrite(CommandeFrite $commandeFrite): self
+    {
+        if ($this->commandeFrites->removeElement($commandeFrite)) {
+            // set the owning side to null (unless already changed)
+            if ($commandeFrite->getCommande() === $this) {
+                $commandeFrite->setCommande(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, CommandeBurger>
+     */
+    public function getCommandeBurgers(): Collection
+    {
+        return $this->commandeBurgers;
+    }
+
+    public function addCommandeBurger(CommandeBurger $commandeBurger): self
+    {
+        if (!$this->commandeBurgers->contains($commandeBurger)) {
+            $this->commandeBurgers[] = $commandeBurger;
+            $commandeBurger->setCommande($this);
+        }
+
+        return $this;
+    }
+
+    public function removeCommandeBurger(CommandeBurger $commandeBurger): self
+    {
+        if ($this->commandeBurgers->removeElement($commandeBurger)) {
+            // set the owning side to null (unless already changed)
+            if ($commandeBurger->getCommande() === $this) {
+                $commandeBurger->setCommande(null);
+            }
+        }
 
         return $this;
     }

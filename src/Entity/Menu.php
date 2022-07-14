@@ -92,12 +92,16 @@ class Menu extends Produit
     #[ORM\OneToMany(mappedBy: 'menu', targetEntity: MenuTaille::class, cascade: ["persist"])]
     private $menuTailles;
 
+    #[ORM\OneToMany(mappedBy: 'menu', targetEntity: CommandeMenu::class)]
+    private $commandeMenus;
+
     public function __construct()
     {
         parent::__construct();
         $this->menuFrites = new ArrayCollection();
         $this->menuBurgers = new ArrayCollection();
         $this->menuTailles = new ArrayCollection();
+        $this->commandeMenus = new ArrayCollection();
     }
   
   
@@ -224,6 +228,36 @@ class Menu extends Produit
         $menutaille->setMenu($this);
 
         $this->addMenuTaille($menutaille);
+    }
+
+    /**
+     * @return Collection<int, CommandeMenu>
+     */
+    public function getCommandeMenus(): Collection
+    {
+        return $this->commandeMenus;
+    }
+
+    public function addCommandeMenu(CommandeMenu $commandeMenu): self
+    {
+        if (!$this->commandeMenus->contains($commandeMenu)) {
+            $this->commandeMenus[] = $commandeMenu;
+            $commandeMenu->setMenu($this);
+        }
+
+        return $this;
+    }
+
+    public function removeCommandeMenu(CommandeMenu $commandeMenu): self
+    {
+        if ($this->commandeMenus->removeElement($commandeMenu)) {
+            // set the owning side to null (unless already changed)
+            if ($commandeMenu->getMenu() === $this) {
+                $commandeMenu->setMenu(null);
+            }
+        }
+
+        return $this;
     }
 
 }

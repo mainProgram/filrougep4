@@ -91,17 +91,11 @@ class Produit
     #[Groups(["produit:read", "produit:detail", "produit:write"])]
     protected $image;
 
-    // #[ORM\Column(type: 'object', nullable: true)]
     private $imageWrapper;
-
-    #[ORM\OneToMany(mappedBy: 'produit', targetEntity: CommandeProduit::class)]
-    private $commandeProduits;
-
  
     public function __construct()
     {
         $this->commande = new ArrayCollection();
-        $this->commandeProduits = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -198,37 +192,4 @@ class Produit
         return $this;
     }
 
-    /**
-     * @return Collection<int, CommandeProduit>
-     */
-    public function getCommandeProduits(): Collection
-    {
-        return $this->commandeProduits;
-    }
-
-    public function addCommandeProduit(CommandeProduit $commandeProduit): self
-    {
-        if (!$this->commandeProduits->contains($commandeProduit)) {
-            $this->commandeProduits[] = $commandeProduit;
-            $commandeProduit->setProduit($this);
-        }
-
-        return $this;
-    }
-
-    public function removeCommandeProduit(CommandeProduit $commandeProduit): self
-    {
-        if ($this->commandeProduits->removeElement($commandeProduit)) {
-            // set the owning side to null (unless already changed)
-            if ($commandeProduit->getProduit() === $this) {
-                $commandeProduit->setProduit(null);
-            }
-        }
-
-        return $this;
-    }
-
-  
-
-    
 }

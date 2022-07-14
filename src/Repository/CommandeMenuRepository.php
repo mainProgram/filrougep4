@@ -2,26 +2,26 @@
 
 namespace App\Repository;
 
-use App\Entity\CommandeProduit;
+use App\Entity\CommandeMenu;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
- * @extends ServiceEntityRepository<CommandeProduit>
+ * @extends ServiceEntityRepository<CommandeMenu>
  *
- * @method CommandeProduit|null find($id, $lockMode = null, $lockVersion = null)
- * @method CommandeProduit|null findOneBy(array $criteria, array $orderBy = null)
- * @method CommandeProduit[]    findAll()
- * @method CommandeProduit[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
+ * @method CommandeMenu|null find($id, $lockMode = null, $lockVersion = null)
+ * @method CommandeMenu|null findOneBy(array $criteria, array $orderBy = null)
+ * @method CommandeMenu[]    findAll()
+ * @method CommandeMenu[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
  */
-class CommandeProduitRepository extends ServiceEntityRepository
+class CommandeMenuRepository extends ServiceEntityRepository
 {
     public function __construct(ManagerRegistry $registry)
     {
-        parent::__construct($registry, CommandeProduit::class);
+        parent::__construct($registry, CommandeMenu::class);
     }
 
-    public function add(CommandeProduit $entity, bool $flush = false): void
+    public function add(CommandeMenu $entity, bool $flush = false): void
     {
         $this->getEntityManager()->persist($entity);
 
@@ -30,7 +30,7 @@ class CommandeProduitRepository extends ServiceEntityRepository
         }
     }
 
-    public function remove(CommandeProduit $entity, bool $flush = false): void
+    public function remove(CommandeMenu $entity, bool $flush = false): void
     {
         $this->getEntityManager()->remove($entity);
 
@@ -40,7 +40,7 @@ class CommandeProduitRepository extends ServiceEntityRepository
     }
 
 //    /**
-//     * @return CommandeProduit[] Returns an array of CommandeProduit objects
+//     * @return CommandeMenu[] Returns an array of CommandeMenu objects
 //     */
 //    public function findByExampleField($value): array
 //    {
@@ -54,7 +54,7 @@ class CommandeProduitRepository extends ServiceEntityRepository
 //        ;
 //    }
 
-//    public function findOneBySomeField($value): ?CommandeProduit
+//    public function findOneBySomeField($value): ?CommandeMenu
 //    {
 //        return $this->createQueryBuilder('c')
 //            ->andWhere('c.exampleField = :val')
