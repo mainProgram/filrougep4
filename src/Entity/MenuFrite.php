@@ -9,7 +9,18 @@ use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\Entity(repositoryClass: MenuFriteRepository::class)]
-#[ApiResource()]
+#[ApiResource(
+    collectionOperations:[
+        "get" => [
+            "openapi_context" => ["summary"=>"hidden"]
+        ]
+    ] ,
+    itemOperations:[
+        "get" => [
+            "openapi_context" => ["summary"=>"hidden"]
+        ]
+    ] 
+)]
 class MenuFrite
 {
     #[ORM\Id]
@@ -23,10 +34,10 @@ class MenuFrite
     private $quantite = 1;
 
     #[ORM\ManyToOne(targetEntity: Frite::class, inversedBy: 'menuFrites')]
+    #[Assert\NotNull(message: "Renseignez les frites !")]
     #[Groups(["menu:write"])]
     private $frite;
 
-    #[Groups(["menu:write"])]
     #[ORM\ManyToOne(targetEntity: Menu::class, inversedBy: 'menuFrites')]
     private $menu;
 

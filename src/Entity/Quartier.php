@@ -14,11 +14,10 @@ use Symfony\Component\Validator\Constraints as Assert;
     securityMessage : "Vous n'êtes pas autorisé !",
     collectionOperations: [
         "get" => [
-            "normalization_context" => [
-                "groups" => [
-                    "quartier:list"
-                ]  
-            ]
+            "normalization_context" => ["groups" => ["quartier:read"]  ]
+        ],
+        "post" => [
+            "denormalization_context" => ["groups" => ["quartier:write"]  ]
         ]
     ]
 )]
@@ -31,13 +30,14 @@ class Quartier
 
     #[Assert\NotBlank(message: "Ce champ est requis !")]
     #[ORM\Column(type: 'string', length: 50, unique: true)]
-    #[Groups(["zone:list", "quartier:list" ])]
+    #[Groups(["zone:read", "quartier:read", "quartier:write"])]
     private $nom;
 
     #[ORM\Column(type: 'boolean')]
     private $isEtat = true;
 
     #[ORM\ManyToOne(targetEntity: Zone::class, inversedBy: 'quartiers')]
+    #[Groups(["quartier:write"])]
     #[ORM\JoinColumn(nullable: false)]
     private $zone;
 

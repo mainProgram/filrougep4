@@ -29,14 +29,23 @@ class ProduitDataPersister implements DataPersisterInterface
 
     public function persist($data)
     {
-        dd("dfghjkl");
+        dd($data);
+
         if($data instanceof Boisson)
+        {
+            $prix = $data->getTailleBoissons()[0]->getTaille()->getPrix();
+            $data->getTailleBoissons()[0]->setPrix($prix);
             $data->setPrix((0));
+        }
         elseif ($data instanceof Menu)
+        {
+
             $this->service->calculPrix($data);
+        }
 
         // $file = $data->getImageWrapper();
         // $img = file_get_contents($file);
+        // $data->setImage($img);
 
         // $file = $data->getImageWrapper()->getRealPath();
         // $img = stream_get_contents(fopen($file, "rb"));

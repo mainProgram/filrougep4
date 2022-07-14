@@ -2,22 +2,39 @@
 
 namespace App\Entity;
 
-use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use App\Repository\LivreurRepository;
+use Doctrine\Common\Collections\Collection;
 use ApiPlatform\Core\Annotation\ApiResource;
+use Doctrine\Common\Collections\ArrayCollection;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\Entity(repositoryClass: LivreurRepository::class)]
 #[ApiResource(
     security: 'is_granted("ROLE_GESTIONNAIRE)',
-    securityMessage : "Vous n'êtes pas autorisé !"
+    securityMessage : "Vous n'êtes pas autorisé !",
+    collectionOperations:[
+        "get" => [
+            "normalization_context" => ["groups" => ["sign_up:read"]]
+        ],
+        "post" => [
+            "denormalization_context" => [ "groups" => ["sign_up:write"]],
+            "normalization_context" => ["groups" => ["sign_up:read"]]
+        ]
+        ],
+        itemOperations:[
+            "get" => [
+                "normalization_context" => [ "groups" => ["livreur:detail"]],
+            ]
+        ]
 )]
 class Livreur extends User
 {
+    #[Groups(["sign_up:write", "sign_up:read", "livreur:detail"])]
     #[ORM\Column(type: 'string', length: 50, unique: true)]
     private $matriculeMoto;
 
+    #[Groups(["livreur:detail"])]
     #[ORM\OneToMany(mappedBy: 'livreur', targetEntity: Livraison::class)]
     private $livraisons;
 

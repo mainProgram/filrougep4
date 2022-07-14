@@ -17,14 +17,27 @@ use Symfony\Component\Serializer\Annotation\Groups;
  * @ORM\Table(name="taille_boisson")
  */
 #[ApiResource(
+    // collectionOperations:[
+    //     "get" => [
+    //         "method" => "get",
+    //         "status" => 200,
+    //         "normalization_context" => [
+    //             "groups" => ["taille_boisson:read"]
+    //         ]
+    //     ], "post"
+    // ],
+    // itemOperations:[
+    //     "get"
+    // ] 
     collectionOperations:[
         "get" => [
-            "method" => "get",
-            "status" => 200,
-            // "normalization_context" => [
-            //     "groups" => ["taille_boisson"]
-            // ]
-        ], "post"
+            "openapi_context" => ["summary"=>"hidden"]
+        ]
+    ] ,
+    itemOperations:[
+        "get" => [
+            "openapi_context" => ["summary"=>"hidden"]
+        ]
     ]
 )]
 class TailleBoisson
@@ -35,24 +48,32 @@ class TailleBoisson
     #[ORM\Column(type: 'integer')]
     private $id;
 
-    #[Groups(["boisson:write", "taille_boisson"])]
+    #[Groups([ "taille_boisson:read"])]
     #[ORM\Column(type: 'float')]
     private $prix;
 
+    #[Assert\NotNull(message: "Renseignez la quantité en stock !")]
     #[Assert\Positive(message: "La quantité doit être supérieure à 0 !")]
     #[Groups(["boisson:write"])]
     #[ORM\Column(type: 'integer', nullable: true)]
     private $quantiteStock;
 
-    #[Groups(["boisson:write"])]
+    #[Groups(["boisson:write", "taille_boisson:read"])]
+    #[Assert\NotNull(message: "Renseignez la taille !")]
     #[ORM\ManyToOne(targetEntity: Taille::class, inversedBy: 'tailleBoissons')]
     private $taille;
 
+    #[Assert\NotNull(message: "Renseignez la boisson !")]
+    #[Groups(["taille_boisson:read"])]
     #[ORM\ManyToOne(targetEntity: Boisson::class, inversedBy: 'tailleBoissons')]
     private $boisson;
 
+    #[ORM\OneToMany(mappedBy: 'tailleBoisson', targetEntity: CommandeTailleBoisson::class)]
+    private $commandeTailleBoissons;
+
     public function __construct()
     {
+        $this->commandeTailleBoissons = new ArrayCollection();
     }
 
 
@@ -120,6 +141,35 @@ class TailleBoisson
         return $this;
     }
 
+    /**
+     * @return Collection<int, CommandeTailleBoisson>
+     */
+    public function getCommandeTailleBoissons(): Collection
+    {
+        return $this->commandeTailleBoissons;
+    }
+
+    public function addCommandeTailleBoisson(CommandeTailleBoisson $commandeTailleBoisson): self
+    {
+        if (!$this->commandeTailleBoissons->contains($commandeTailleBoisson)) {
+            $this->commandeTailleBoissons[] = $commandeTailleBoisson;
+            $commandeTailleBoisson->setTailleBoisson($this);
+        }
+
+        return $this;
+    }
+
+    public function removeCommandeTailleBoisson(CommandeTailleBoisson $commandeTailleBoisson): self
+    {
+        if ($this->commandeTailleBoissons->removeElement($commandeTailleBoisson)) {
+            // set the owning side to null (unless already changed)
+            if ($commandeTailleBoisson->getTailleBoisson() === $this) {
+                $commandeTailleBoisson->setTailleBoisson(null);
+            }
+        }
+
+        return $this;
+    }
 
    
 }

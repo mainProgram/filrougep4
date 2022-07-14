@@ -7,11 +7,20 @@ use App\Repository\TailleRepository;
 use Doctrine\Common\Collections\Collection;
 use ApiPlatform\Core\Annotation\ApiResource;
 use Doctrine\Common\Collections\ArrayCollection;
+use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Serializer\Annotation\Groups;
 
 
 #[ORM\Entity(repositoryClass: TailleRepository::class)]
-#[ApiResource()]
+#[ApiResource(
+    collectionOperations:[
+        "post" => ["denormalization_context" => [ "groups" => ["taille:write"]]],
+        "get" => ["normalization_context" => [ "groups" => ["taille:read"]]]
+    ],
+    itemOperations:[
+        "get", "put", "delete"
+    ]
+)]
 class Taille
 {
     #[ORM\Id]
@@ -20,10 +29,15 @@ class Taille
     #[Groups(["menu:write"])]
     private $id;
 
-    #[ORM\Column(type: 'string', length: 20)]
-    #[Groups(["taille_boisson", "menu:detail"])]
+    #[Assert\NotBlank(message: "Ce champ est requis !")]
+    #[ORM\Column(type: 'string', length: 20, unique: true)]
+    #[Groups(["taille_boisson:read", "menu:detail", "taille:read", "taille:write"])]
     private $nom;
 
+
+    #[Assert\NotBlank(message: "Ce champ est requis !")]
+    #[Assert\Positive(message: "Le prix doit être supérieur à 0 !")]
+    #[Groups([ "taille:read", "taille:write"])]
     #[ORM\Column(type: 'integer', nullable: true)]
     private $prix;
 

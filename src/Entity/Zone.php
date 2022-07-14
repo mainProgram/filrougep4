@@ -18,14 +18,15 @@ use Symfony\Component\Security\Core\Role\RoleHierarchy;
    securityMessage: "Vous n'êtes pas autorisé !",
    collectionOperations: [
     "get" => [
-        "normalization_context" => [
-            "groups" => [
-                "zone:list"
-            ]
-        ]
+        "normalization_context" => [ "groups" => [ "zone:read"]]
     ],
-    "post"
-]
+    "post" => [
+        "denormalization_context" => [ "groups" => ["zone:write"]],
+        "normalization_context" => [ "groups" => [ "zone:read"]]
+    ]],
+    itemOperations: [ 
+        "get", "put", "delete"
+    ]
 )]
 class Zone
 {
@@ -34,14 +35,14 @@ class Zone
     #[ORM\Column(type: 'integer')]
     private $id;
 
-    #[Assert\NotBlank(message: "Ce champ est requis !")]
+    #[Assert\Length(min:1, minMessage: "Nom invalide !")]
     #[ORM\Column(type: 'string', length: 20, unique: true)]
-    #[Groups(["zone:list"])]
+    #[Groups(["zone:read", "zone:write"])]
     private $nom;
 
     #[Assert\NotBlank(message: "Ce champ est requis !")]
     #[Assert\Positive(message: "Le prix doit être supérieur à 0 !")]
-    #[Groups(["zone:list"])]
+    #[Groups(["zone:read", "zone:write"])]
     #[ORM\Column(type: 'float')]
     private $prix;
 
@@ -49,7 +50,7 @@ class Zone
     private $isEtat = true;
 
     #[ORM\OneToMany(mappedBy: 'zone', targetEntity: Quartier::class)]
-    #[Groups(["zone:list"])]
+    #[Groups(["zone:read", "zone:write"])]
     private $quartiers;
 
     #[ORM\OneToMany(mappedBy: 'zone', targetEntity: Commande::class)]

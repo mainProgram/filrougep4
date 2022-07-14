@@ -2,13 +2,15 @@
 
 namespace App\Entity;
 
-use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use App\Controller\BurgerController;
 use App\Repository\BurgerRepository;
 use ApiPlatform\Core\Annotation\ApiFilter;
+use Doctrine\Common\Collections\Collection;
 use ApiPlatform\Core\Annotation\ApiResource;
+use Doctrine\Common\Collections\ArrayCollection;
+use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Validator\Constraints as Assert;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\SearchFilter;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\NumericFilter;
 
@@ -21,10 +23,11 @@ use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\NumericFilter;
             "security" => "is_granted('ROLE_GESTIONNAIRE')",
             "security_message" => "Vous n'êtes pas autorisé !",
             "normalization_context" => [
-                "groups" => ["produit:list"]
+                "groups" => ["produit:read"]
             ]
         ],
         "post" => [ 
+            "denormalization_context" => [ "groups" => ["produit:write"]],
             "security_post_denormalize" => "is_granted('BURGER_CREATE', object)",
             "security_post_denormalize_message" => "Access dentzbgnukjm" 
         ],
@@ -71,6 +74,11 @@ use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\NumericFilter;
 #[ApiFilter(NumericFilter::class, properties: ['prix'])]
 class Burger extends Produit
 {
+    #[Assert\NotBlank(message: "Ce champ est requis !")]
+    #[Groups(["produit:write"])]
+    #[Assert\Positive(message: "Le prix doit être supérieur à 0 !")]
+    protected $prix;
+
     #[ORM\OneToMany(mappedBy: 'burger', targetEntity: MenuBurger::class)]
     private $menuBurgers;
 

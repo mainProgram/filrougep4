@@ -4,13 +4,16 @@ namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 use App\Repository\CommandeRepository;
+use ApiPlatform\Core\Annotation\ApiFilter;
 use Doctrine\Common\Collections\Collection;
 use ApiPlatform\Core\Annotation\ApiResource;
 use Doctrine\Common\Collections\ArrayCollection;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Serializer\Annotation\SerializedName;
+use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\SearchFilter;
 
 #[ORM\Entity(repositoryClass: CommandeRepository::class)]
+#[ApiFilter(SearchFilter::class, properties: ['zone.nom' => 'ipartial' ])]
 #[ApiResource(
     collectionOperations:[
         "post" => [
@@ -68,9 +71,15 @@ class Commande
     #[ORM\Column(type: 'float', nullable: true)]
     private $prix;
 
+    #[ORM\OneToMany(mappedBy: 'commande', targetEntity: CommandeTailleBoisson::class)]
+    private $commandeTailleBoissons;
+
+  
+
     public function __construct()
     {
         $this->commandeProduits = new ArrayCollection();
+        $this->commandeTailleBoissons = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -203,4 +212,36 @@ class Commande
 
         return $this;
     }
+
+    /**
+     * @return Collection<int, CommandeTailleBoisson>
+     */
+    public function getCommandeTailleBoissons(): Collection
+    {
+        return $this->commandeTailleBoissons;
+    }
+
+    public function addCommandeTailleBoisson(CommandeTailleBoisson $commandeTailleBoisson): self
+    {
+        if (!$this->commandeTailleBoissons->contains($commandeTailleBoisson)) {
+            $this->commandeTailleBoissons[] = $commandeTailleBoisson;
+            $commandeTailleBoisson->setCommande($this);
+        }
+
+        return $this;
+    }
+
+    public function removeCommandeTailleBoisson(CommandeTailleBoisson $commandeTailleBoisson): self
+    {
+        if ($this->commandeTailleBoissons->removeElement($commandeTailleBoisson)) {
+            // set the owning side to null (unless already changed)
+            if ($commandeTailleBoisson->getCommande() === $this) {
+                $commandeTailleBoisson->setCommande(null);
+            }
+        }
+
+        return $this;
+    }
+
+ 
 }

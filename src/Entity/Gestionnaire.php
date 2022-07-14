@@ -9,7 +9,18 @@ use App\Repository\GestionnaireRepository;
 use ApiPlatform\Core\Annotation\ApiResource;
 
 #[ORM\Entity(repositoryClass: GestionnaireRepository::class)]
-#[ApiResource]
+#[ApiResource(
+    collectionOperations:[
+        "get" => [
+            "openapi_context" => ["summary"=>"hidden"]
+        ]
+    ] ,
+    itemOperations:[
+        "get" => [
+            "openapi_context" => ["summary"=>"hidden"]
+        ]
+    ] 
+)]
 class Gestionnaire extends User
 {
     #[ORM\OneToMany(mappedBy: 'gestionnaire', targetEntity: Commande::class)]

@@ -9,7 +9,18 @@ use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\Entity(repositoryClass: MenuTailleRepository::class)]
-#[ApiResource()]
+#[ApiResource(
+    collectionOperations:[
+        "get" => [
+            "openapi_context" => ["summary"=>"hidden"]
+        ]
+    ] ,
+    itemOperations:[
+        "get" => [
+            "openapi_context" => ["summary"=>"hidden"]
+        ]
+    ]
+)]
 class MenuTaille
 {
     #[ORM\Id]
@@ -22,11 +33,11 @@ class MenuTaille
     #[ORM\Column(type: 'integer', nullable: true)]
     private $quantite = 1;
 
-    #[Groups(["menu:write"])]
     #[ORM\ManyToOne(targetEntity: Menu::class, inversedBy: 'menuTailles')]
     private $menu;
 
     #[Groups(["menu:write"])]
+    #[Assert\NotNull(message: "Renseignez la taille !")]
     #[ORM\ManyToOne(targetEntity: Taille::class, inversedBy: 'menuTailles')]
     private $taille;
 

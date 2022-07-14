@@ -6,10 +6,13 @@ use Doctrine\ORM\Mapping as ORM;
 use App\Repository\LivraisonRepository;
 use Doctrine\Common\Collections\Collection;
 use ApiPlatform\Core\Annotation\ApiResource;
+use Symfony\Component\Validator\Constraints as Assert;
 use Doctrine\Common\Collections\ArrayCollection;
 
 #[ORM\Entity(repositoryClass: LivraisonRepository::class)]
-#[ApiResource]
+#[ApiResource(
+    itemOperations:["get", "put"]
+)]
 class Livraison
 {
     #[ORM\Id]
@@ -27,6 +30,7 @@ class Livraison
     private $livreur;
 
     #[ORM\OneToMany(mappedBy: 'livraison', targetEntity: Commande::class)]
+    #[Assert\Count(min:1, minMessage:"Renseigner les commandes !")]
     private $commandes;
 
     public function __construct()

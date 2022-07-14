@@ -7,6 +7,7 @@ use App\Repository\FriteRepository;
 use Doctrine\Common\Collections\Collection;
 use ApiPlatform\Core\Annotation\ApiResource;
 use Doctrine\Common\Collections\ArrayCollection;
+use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\Entity(repositoryClass: FriteRepository::class)]
@@ -18,7 +19,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
             "security" => "is_granted('ROLE_GESTIONNAIRE')",
             "security_message" => "Vous n'êtes pas autorisé !",
             "normalization_context" => [
-                "groups" => ["produit:list"]
+                "groups" => ["produit:read"]
             ]
         ],
         "post" => [
@@ -26,11 +27,8 @@ use Symfony\Component\Serializer\Annotation\Groups;
             "method" => "post",
             "security" => "is_granted('ROLE_GESTIONNAIRE')",
             "security_message" => "Vous n'êtes pas autorisé !",
-            "normalization_context" => [
-                "groups" => ["produit:detail"]
-            ],
-           
-            
+            "normalization_context" => ["groups" => ["produit:detail"]],
+            "denormalization_context" => [ "groups" => ["produit:write"]],
         ],
     ],
     itemOperations: [
@@ -55,6 +53,12 @@ use Symfony\Component\Serializer\Annotation\Groups;
 )]
 class Frite extends Produit
 {
+
+    #[Assert\NotBlank(message: "Ce champ est requis !")]
+    #[Groups(["produit:write"])]
+    #[Assert\Positive(message: "Le prix doit être supérieur à 0 !")]
+    protected $prix;
+
     #[ORM\OneToMany(mappedBy: 'frite', targetEntity: MenuFrite::class)]
     private $menuFrites;
 

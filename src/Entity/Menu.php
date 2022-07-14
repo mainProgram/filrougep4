@@ -24,31 +24,27 @@ use Symfony\Component\Serializer\Annotation\SerializedName;
         "get" => [
             "security" => "is_granted('ROLE_GESTIONNAIRE')",
             "security_message" => "Vous n'êtes pas autorisé !",
-            "normalization_context" => [
-                "groups" => ["produit:list"]
-            ]
+            "normalization_context" => [ "groups" => ["produit:list"]   ]
         ],
         "post" => [
             "method" => "post",
             "status" => 201,
             "security" => "is_granted('ROLE_GESTIONNAIRE')",
             "security_message" => "Vous n'êtes pas autorisé !",
-            "denormalization_context" => [
-                "groups" => ["menu:write"]
-            ],   
+            "denormalization_context" => [   "groups" => ["menu:write"]],   
         ],
-        "addMenu" => [
-            "method" => "post",
-            "deserialize" => false,
-            "status" => 201,
-            "security" => "is_granted('ROLE_GESTIONNAIRE')",
-            "security_message" => "Vous n'êtes pas autorisé !",
-            "controller" => MenuController::class,
-            "path" => "/addMenu",
+        // "addMenu" => [
+        //     "method" => "post",
+        //     "deserialize" => false,
+        //     "status" => 201,
+        //     "security" => "is_granted('ROLE_GESTIONNAIRE')",
+        //     "security_message" => "Vous n'êtes pas autorisé !",
+        //     "controller" => MenuController::class,
+        //     "path" => "/addMenu",
             // "denormalization_context" => [
             //     "groups" => ["menu:write"]
             // ],  
-        ]
+        // ]
     ],
     itemOperations:[
         "put" => [
@@ -64,9 +60,7 @@ use Symfony\Component\Serializer\Annotation\SerializedName;
             "normalization_context" => [
                 "groups" => ["produit:detail"]
             ]
-        ],
-        "patch"
-
+        ]
     ]
 )]
 #[ApiFilter(PropertyFilter::class)]
@@ -82,17 +76,24 @@ class Menu extends Produit
     #[SerializedName("image")]
     protected $imageWrapper;
 
+    #[Assert\Valid()]
     #[Groups(["menu:write"])]
     #[ORM\OneToMany(mappedBy: 'menu', targetEntity: MenuFrite::class, cascade: ["persist"])]
     private $menuFrites;
 
     #[Groups(["menu:write"])]
+    #[Assert\Valid()]
+    #[Assert\Count(min:1, minMessage: "Renseignez le burger !")]
     #[ORM\OneToMany(mappedBy: 'menu', targetEntity: MenuBurger::class, cascade: ["persist"])]
     private $menuBurgers;
 
+    #[Assert\Valid()]
     #[Groups(["menu:write"])]
     #[ORM\OneToMany(mappedBy: 'menu', targetEntity: MenuTaille::class, cascade: ["persist"])]
     private $menuTailles;
+
+    #[ORM\OneToMany(mappedBy: 'menu', targetEntity: CommandeTailleBoisson::class)]
+    private $commandeTailleBoissons;
 
     public function __construct()
     {
@@ -100,6 +101,7 @@ class Menu extends Produit
         $this->menuFrites = new ArrayCollection();
         $this->menuBurgers = new ArrayCollection();
         $this->menuTailles = new ArrayCollection();
+        $this->commandeTailleBoissons = new ArrayCollection();
     }
   
   
@@ -226,6 +228,36 @@ class Menu extends Produit
         $menutaille->setMenu($this);
 
         $this->addMenuTaille($menutaille);
+    }
+
+    /**
+     * @return Collection<int, CommandeTailleBoisson>
+     */
+    public function getCommandeTailleBoissons(): Collection
+    {
+        return $this->commandeTailleBoissons;
+    }
+
+    public function addCommandeTailleBoisson(CommandeTailleBoisson $commandeTailleBoisson): self
+    {
+        if (!$this->commandeTailleBoissons->contains($commandeTailleBoisson)) {
+            $this->commandeTailleBoissons[] = $commandeTailleBoisson;
+            $commandeTailleBoisson->setMenu($this);
+        }
+
+        return $this;
+    }
+
+    public function removeCommandeTailleBoisson(CommandeTailleBoisson $commandeTailleBoisson): self
+    {
+        if ($this->commandeTailleBoissons->removeElement($commandeTailleBoisson)) {
+            // set the owning side to null (unless already changed)
+            if ($commandeTailleBoisson->getMenu() === $this) {
+                $commandeTailleBoisson->setMenu(null);
+            }
+        }
+
+        return $this;
     }
    
 }

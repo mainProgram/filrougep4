@@ -42,7 +42,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     #[ORM\Column(type: 'string', length: 180, unique: true)]
     #[Assert\Email(message: "Ce addresse mail est invalide !")]
-    #[Groups(["burger:detail", "sign_up:write", "sign_up:read"])]
+    #[Groups(["burger:detail", "sign_up:write", "sign_up:read", "livreur:detail"])]
     protected $email;
 
     #[ORM\Column(type: 'json')]
@@ -59,23 +59,24 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[Groups(["sign_up:write"])]
     protected $confirmPassword;
 
-    #[Groups(["sign_up:write", "sign_up:read"])]
+    #[Groups(["sign_up:write", "sign_up:read", "livreur:detail"])]
     #[Assert\Length(min:2, minMessage: "Nom invalide !")]
     #[ORM\Column(type: 'string', length: 40)]
     protected $nom;
 
-    #[Groups(["sign_up:write", "sign_up:read"])]
+    #[Groups(["sign_up:write", "sign_up:read", "livreur:detail"])]
     #[Assert\Length(min:2, minMessage: "Prénom invalide !")]
     #[Assert\Regex(pattern:"/^[a-zA-ZàáâäãåąčćęèéêëėįìíîïłńòóôöõøùúûüųūÿýżźñçčšžÀÁÂÄÃÅĄĆČĖĘÈÉÊËÌÍÎÏĮŁŃÒÓÔÖÕØÙÚÛÜŲŪŸÝŻŹÑßÇŒÆČŠŽ∂ð ,.'-]+$/u", message: "Nom invalide !")]
     #[ORM\Column(type: 'string', length: 40)]
     protected $prenom;
 
-    #[Groups(["sign_up:write", "sign_up:read"])]
+    #[Groups(["sign_up:write", "sign_up:read", "livreur:detail"])]
     #[Assert\Length(min:9, minMessage: "Longueur invalide !")]
     #[Assert\Regex(pattern:"/^(77|78|75|76|70|33)[0-9]{7}$/", message: "Numéro non valide !")]
     #[ORM\Column(type: 'string', length: 30)]
     protected $telephone;
 
+    #[Groups(["livreur:detail"])]
     #[ORM\Column(type: 'boolean')]
     protected $isEtat = true;
 
@@ -86,6 +87,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(type: 'string', length: 255, nullable: true)]
     protected $token;
 
+    #[Groups(["livreur:detail"])]
     #[ORM\Column(type: 'boolean', nullable: true)] //Compte bloqué par défaut
     protected $isActivated = false;
 
