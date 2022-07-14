@@ -12,7 +12,9 @@ use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Validator\Constraints\Bic;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use ApiPlatform\Core\DataPersister\DataPersisterInterface;
+use App\Entity\Gestionnaire;
 use App\Repository\TailleBoissonRepository;
+use GMP;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 
 class CommandeDataPersister implements DataPersisterInterface
@@ -24,61 +26,99 @@ class CommandeDataPersister implements DataPersisterInterface
 
     public function persist($data)
     {
-        
         $user = $this->token->getToken()->getUser();
 
-        if($data instanceof Commande && $user instanceof Client)
-        {
-            //----------------------------------------------------------------------------Client 
+        if($user instanceof Client)
             $data->setClient($user);
+        elseif($user instanceof Gestionnaire)
+            $data->setGestionnaire($user);
 
-            //------------------------------y'a til un burger ou un menu d'abord ?
-            $lignesDeCommandes = $data->getCommandeProduits();
-            $found = false;
-            foreach($lignesDeCommandes as $ldc)
-                if($ldc->getProduit() instanceof Menu or $ldc->getProduit() instanceof Burger)
-                    $found = true;  
-            
-            if(!$found)
-                return new JsonResponse( ["error" => "Commande sans Burger ou Menu !"], 400);
+        //------------------------------y'a til un burger ou un menu d'abord ?
+        $lignesDeCommandes = $data->getCommandeProduits();
+        $found = false;
+        foreach($lignesDeCommandes as $ldc)
+            if($ldc->getProduit() instanceof Menu or $ldc->getProduit() instanceof Burger)
+                $found = true;  
+        
+        if(!$found)
+            return new JsonResponse( ["error" => "Commande sans Burger ou Menu !"], 400);
+   
 
-            //----------------------------------------------------------------------------YA DES BOISSONS DANS LES MENUS ?
-            foreach($lignesDeCommandes as $ldc)
-            if($ldc->getProduit() instanceof Menu)
+        //----------------------------------------------------------------------------YA DES BOISSONS DANS LES MENUS ?
+        foreach($lignesDeCommandes as $ldc)
+        if($ldc->getProduit() instanceof Menu)
+        {
+            //----------------------------------------------------------------------------Quantité choisie == quantité du menu ?
+            $taillesDuMenu = $ldc->getProduit()->getMenuTailles();
+            $quantiteBoissons = 0 ;  
+            foreach($taillesDuMenu as $t)
+                $quantiteBoissons += $t->getQuantite();
+
+            $boissonsChoisies = $ldc->getTailleBoissons();
+
+            if(count($boissonsChoisies) != $quantiteBoissons)
+                return new JsonResponse( ["error" => "Le menu ".$ldc->getProduit()->getNom()." a ".count($taillesDuMenu)." boisson (s)!"], 400);
+
+
+            foreach($taillesDuMenu as $taille)
             {
-                $tailles = $ldc->getProduit()->getMenuTailles();  
-                foreach($tailles as $taille)
-                {
-                    $idTaille = $taille->getTaille()->getId();
+               
+                $idTaille = $taille->getTaille()->getId();
+                $quantite = $taille->getQuantite();
+                $combienDeModeles = [];
 
-                    $lesTailles = ($this->tailleBoissonRepository->findBy(["taille" => $idTaille]));
-
-                    $boissonsDispo =  [];
-                    foreach($lesTailles as $lt)
-                        if($lt->getQuantiteStock() > 0)
-                            $boissonsDispo[] = $lt->getBoisson()->getNom();
-
-                     dump($boissonsDispo);
-                }
-            }
-
-
-            //----------------------------------------------------------------------------Prix total commande 
-            $prix = 0;
-            foreach($lignesDeCommandes as $ldc)
-                $prix += $ldc->getQuantite() * $ldc->getProduit()->getPrix() ; 
-
-            $zone = $data->getZone();
-            if($zone)
-                $prix += $zone->getPrix();
+                //----------------------------------------------------------------------------Nombre de PM dans le menu == nombre de PM choisi
+                foreach($boissonsChoisies as $bc)
+                    if($bc->getTaille()->getId() == $idTaille)
+                        $combienDeModeles[] = $bc;
                 
-            $data->setPrix($prix);
+                if($quantite != count($combienDeModeles))
+                    return new JsonResponse( ["error" => "Le menu ".$ldc->getProduit()->getNom()." a ".$quantite." boisson (s) ".$taille->getTaille()->getNom()."!"], 400);
 
-            //----------------------------------------------------------------------------
+                //----------------------------------------------------------------------------Lim choisir disponible ne ?
+                $qb = $this->tailleBoissonRepository->createQueryBuilder('tbrepo')->where('tbrepo.taille = :taille')->setParameter('taille', $idTaille)->andWhere('tbrepo.quantiteStock > 0');
+                $query = $qb->getQuery();
+                $lesTaillesBoissonsDispo = $query->execute();
+
+                foreach($combienDeModeles as $bc)
+                    if(!in_array($bc, $lesTaillesBoissonsDispo))
+                        return new JsonResponse( ["error" => "La boisson ".$bc->getBoisson()->getNom()." en ".$bc->getTaille()->getNom()." n'est pas disponible !"], 400);               
+
+                //----------------------------------------------------------------------------Lim choisir stock bi amnafi ?
+                // foreach($boissonsChoisies as $bc)
+                //     if(!in_array($bc, $lesTaillesBoissonsDispo))
+                      
+            }
+        }
+
+        //----------------------------------------------------------------------------YA TIL DES COMPLEMENTS BOISSONS DANS LES COMMANDES ?
+        $complementsBoissons = $data->getCommandeTailleBoissons();
+        $prixComplements = 0;
+        foreach($complementsBoissons as $complementBoisson)
+        {
+            if($complementBoisson->getTailleBoisson()->getQuantiteStock() >= $complementBoisson->getQuantite())
+                $prixComplements += $complementBoisson->getQuantite() * $complementBoisson->getTailleBoisson()->getPrix();
+            else
+                return new JsonResponse( ["error" => "Il ne reste que ".$complementBoisson->getTailleBoisson()->getQuantiteStock()." ".$complementBoisson->getTailleBoisson()->getBoisson()->getNom()." ".$complementBoisson->getTailleBoisson()->getTaille()->getNom(). " en stock!"], 400);
+
         }
             
+        //----------------------------------------------------------------------------Prix total commande 
+        $prix = 0;
+        foreach($lignesDeCommandes as $ldc)
+            $prix += $ldc->getQuantite() * $ldc->getProduit()->getPrix() ; 
+
+        $zone = $data->getZone();
+        if($zone)
+            $prix += $zone->getPrix();
+            
+        $data->setPrix($prix + $prixComplements);
+
+        //----------------------------------------------------------------------------
+
+        dd($data);
         $this->entityManager->persist($data);       
-        $this->entityManager->flush();       
+        $this->entityManager->flush();     
     }
 
     public function supports($data): bool
@@ -91,4 +131,6 @@ class CommandeDataPersister implements DataPersisterInterface
         $data->setIsEtat(false);
         $this->entityManager->flush();
     }
+
 }
+

@@ -10,6 +10,7 @@ use ApiPlatform\Core\Annotation\ApiResource;
 use Doctrine\Common\Collections\ArrayCollection;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Serializer\Annotation\SerializedName;
+use Symfony\Component\Validator\Constraints as Assert;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\SearchFilter;
 
 #[ORM\Entity(repositoryClass: CommandeRepository::class)]
@@ -55,8 +56,8 @@ class Commande
     private $ticket;
     
     #[Groups(["commande:list"])]
-    #[ORM\Column(type: 'string', length: 10)]
-    private $etat = "En attente";
+    #[ORM\Column(type: 'string', length: 30)]
+    private $etat = "en attente";
     
     #[Groups(["commande:list"])]
     #[ORM\Column(type: 'boolean', nullable: true)]
@@ -64,6 +65,8 @@ class Commande
     
     #[Groups(["commande:list"])]
     // #[SerializedName("produits")]
+    #[Assert\Valid()]
+    #[Assert\Count(min:1, minMessage:"Renseignez un burger ou un menu !")]
     #[ORM\OneToMany(mappedBy: 'commande', targetEntity: CommandeProduit::class, cascade: ["persist"])]
     private $commandeProduits;
 
@@ -71,13 +74,23 @@ class Commande
     #[ORM\Column(type: 'float', nullable: true)]
     private $prix;
 
-    #[ORM\OneToMany(mappedBy: 'commande', targetEntity: CommandeTailleBoisson::class)]
+    #[ORM\OneToMany(mappedBy: 'commande', targetEntity: CommandeTailleBoisson::class, cascade: ["persist"])]
+    // #[SerializedName("boissons")]
+    #[Assert\Valid()]
+    #[Assert\Count(min:1, minMessage:"Renseignez une boisson !")]
     private $commandeTailleBoissons;
+
+    #[ORM\Column(type: 'date', nullable: true)]
+    private $date;
+
+    #[ORM\Column(type: 'string', length: 255, nullable: true)]
+    private $numero;
 
   
 
     public function __construct()
     {
+        $this->date = new \DateTime(); 
         $this->commandeProduits = new ArrayCollection();
         $this->commandeTailleBoissons = new ArrayCollection();
     }
@@ -239,6 +252,30 @@ class Commande
                 $commandeTailleBoisson->setCommande(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getDate(): ?\DateTimeInterface
+    {
+        return $this->date;
+    }
+
+    public function setDate(?\DateTimeInterface $date): self
+    {
+        $this->date = $date;
+
+        return $this;
+    }
+
+    public function getNumero(): ?string
+    {
+        return $this->numero;
+    }
+
+    public function setNumero(?string $numero): self
+    {
+        $this->numero = $numero;
 
         return $this;
     }

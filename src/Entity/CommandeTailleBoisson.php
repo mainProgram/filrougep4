@@ -2,6 +2,7 @@
 
 namespace App\Entity;
 
+use Symfony\Component\Validator\Constraints as Assert;
 use App\Repository\CommandeTailleBoissonRepository;
 use Doctrine\ORM\Mapping as ORM;
 
@@ -16,14 +17,17 @@ class CommandeTailleBoisson
     #[ORM\ManyToOne(targetEntity: Commande::class, inversedBy: 'commandeTailleBoissons')]
     private $commande;
 
+    #[Assert\NotNull(message: "Renseigner une boisson!")]
     #[ORM\ManyToOne(targetEntity: TailleBoisson::class, inversedBy: 'commandeTailleBoissons')]
     private $tailleBoisson;
 
     #[ORM\Column(type: 'integer', nullable: true)]
     private $prix;
 
-    #[ORM\ManyToOne(targetEntity: Menu::class, inversedBy: 'commandeTailleBoissons')]
-    private $menu;
+    #[Assert\NotBlank(message: "Ce champ est requis !")]
+    #[Assert\Positive(message: "La quantité doit être supérieure à 0 !")]
+    #[ORM\Column(type: 'integer', nullable: true)]
+    private $quantite;
 
     public function getId(): ?int
     {
@@ -66,14 +70,14 @@ class CommandeTailleBoisson
         return $this;
     }
 
-    public function getMenu(): ?Menu
+    public function getQuantite(): ?int
     {
-        return $this->menu;
+        return $this->quantite;
     }
 
-    public function setMenu(?Menu $menu): self
+    public function setQuantite(?int $quantite): self
     {
-        $this->menu = $menu;
+        $this->quantite = $quantite;
 
         return $this;
     }

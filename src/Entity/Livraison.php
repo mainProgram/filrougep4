@@ -29,7 +29,7 @@ class Livraison
     #[ORM\ManyToOne(targetEntity: Livreur::class, inversedBy: 'livraisons')]
     private $livreur;
 
-    #[ORM\OneToMany(mappedBy: 'livraison', targetEntity: Commande::class)]
+    #[ORM\OneToMany(mappedBy: 'livraison', targetEntity: Commande::class, cascade:["persist"])]
     #[Assert\Count(min:1, minMessage:"Renseigner les commandes !")]
     private $commandes;
 

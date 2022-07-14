@@ -32,7 +32,14 @@ class CommandeSubscriber
     {
         $gestionnaire = $this->token->getToken()->getUser();
 
+        $numero = "#".$commande->getId();
+
+        $commande->setNumero($numero);
+
         $commande->setGestionnaire($gestionnaire);
+
+        if($commande->getEtat() == "valide")
+            dd("Etat valide");
 
         $this->entityManager->persist($commande);
         $this->entityManager->flush();

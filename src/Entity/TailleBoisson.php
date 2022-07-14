@@ -71,9 +71,13 @@ class TailleBoisson
     #[ORM\OneToMany(mappedBy: 'tailleBoisson', targetEntity: CommandeTailleBoisson::class)]
     private $commandeTailleBoissons;
 
+    #[ORM\ManyToMany(targetEntity: CommandeProduit::class, mappedBy: 'tailleBoissons')]
+    private $commandeProduits;
+
     public function __construct()
     {
         $this->commandeTailleBoissons = new ArrayCollection();
+        $this->commandeProduits = new ArrayCollection();
     }
 
 
@@ -166,6 +170,33 @@ class TailleBoisson
             if ($commandeTailleBoisson->getTailleBoisson() === $this) {
                 $commandeTailleBoisson->setTailleBoisson(null);
             }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, CommandeProduit>
+     */
+    public function getCommandeProduits(): Collection
+    {
+        return $this->commandeProduits;
+    }
+
+    public function addCommandeProduit(CommandeProduit $commandeProduit): self
+    {
+        if (!$this->commandeProduits->contains($commandeProduit)) {
+            $this->commandeProduits[] = $commandeProduit;
+            $commandeProduit->addTailleBoisson($this);
+        }
+
+        return $this;
+    }
+
+    public function removeCommandeProduit(CommandeProduit $commandeProduit): self
+    {
+        if ($this->commandeProduits->removeElement($commandeProduit)) {
+            $commandeProduit->removeTailleBoisson($this);
         }
 
         return $this;
