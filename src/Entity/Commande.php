@@ -12,6 +12,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Serializer\Annotation\SerializedName;
 use Symfony\Component\Validator\Constraints as Assert;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\SearchFilter;
+use App\Services\CommandeService;
 
 #[ORM\Entity(repositoryClass: CommandeRepository::class)]
 #[ApiFilter(SearchFilter::class, properties: ['zone.nom' => 'ipartial' ])]
@@ -32,6 +33,11 @@ use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\SearchFilter;
         ]
     ]
 )]
+
+
+#[Assert\Callback([CommandeService::class, "isThereABurgerOrAMenu"])]
+
+
 class Commande
 {
     #[ORM\Id]
@@ -70,7 +76,6 @@ class Commande
     #[ORM\OneToMany(mappedBy: 'commande', targetEntity: CommandeTailleBoisson::class, cascade: ["persist"])]
     // #[SerializedName("boissons")]
     #[Assert\Valid()]
-    #[Assert\Count(min:1, minMessage:"Renseignez une boisson !")]
     private $commandeTailleBoissons;
 
     #[ORM\Column(type: 'date', nullable: true)]
@@ -79,13 +84,16 @@ class Commande
     #[ORM\Column(type: 'string', length: 255, nullable: true)]
     private $numero;
 
-    #[ORM\OneToMany(mappedBy: 'commande', targetEntity: CommandeMenu::class)]
+    #[Assert\Valid()]
+    #[ORM\OneToMany(mappedBy: 'commande', targetEntity: CommandeMenu::class, cascade: ["persist"])]
     private $commandeMenus;
 
-    #[ORM\OneToMany(mappedBy: 'commande', targetEntity: CommandeFrite::class)]
+    #[Assert\Valid()]
+    #[ORM\OneToMany(mappedBy: 'commande', targetEntity: CommandeFrite::class, cascade: ["persist"])]
     private $commandeFrites;
 
-    #[ORM\OneToMany(mappedBy: 'commande', targetEntity: CommandeBurger::class)]
+    #[Assert\Valid()]
+    #[ORM\OneToMany(mappedBy: 'commande', targetEntity: CommandeBurger::class, cascade: ["persist"])]
     private $commandeBurgers;
 
   

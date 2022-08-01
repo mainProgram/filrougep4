@@ -27,7 +27,7 @@ class CommandeTailleBoisson
     #[Assert\NotBlank(message: "Ce champ est requis !")]
     #[Assert\Positive(message: "La quantité doit être supérieure à 0 !")]
     #[ORM\Column(type: 'integer', nullable: true)]
-    private $quantite;
+    private $quantite = 1;
 
     public function getId(): ?int
     {

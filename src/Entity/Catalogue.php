@@ -17,7 +17,7 @@ use ApiPlatform\Core\Annotation\ApiProperty;
             "status" => 200,
             "path" => "/catalogue",
             "normalization_context" => [
-                "groups" => ["menu:list"]
+                "groups" => ["produit:detail"]
             ]
         ]
     ],  

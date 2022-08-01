@@ -33,6 +33,7 @@ class Zone
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: 'integer')]
+    #[Groups(["zone:read"])]
     private $id;
 
     #[Assert\Length(min:1, minMessage: "Nom invalide !")]

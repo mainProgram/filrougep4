@@ -3,6 +3,7 @@
 namespace App\Entity;
 
 use App\Repository\CommandeFriteRepository;
+use Symfony\Component\Validator\Constraints as Assert;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: CommandeFriteRepository::class)]
@@ -14,11 +15,14 @@ class CommandeFrite
     private $id;
 
     #[ORM\Column(type: 'integer')]
+    #[Assert\NotBlank(message: "Ce champ est requis !")]
+    #[Assert\Positive(message: "La quantité doit être supérieure à 0 !")]
     private $quantite = 1;
 
     #[ORM\Column(type: 'integer', nullable: true)]
     private $prix;
 
+    #[Assert\NotNull(message: "Renseigner des frites !")]
     #[ORM\ManyToOne(targetEntity: Frite::class, inversedBy: 'commandeFrites')]
     private $frite;
 

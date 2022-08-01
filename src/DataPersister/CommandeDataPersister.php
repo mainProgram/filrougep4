@@ -4,28 +4,27 @@ namespace App\DataPersister;
 
 use App\Entity\Menu;
 use App\Entity\Zone;
-use App\Entity\Burger;
 use App\Entity\Client;
 use App\Entity\Commande;
 use App\Entity\Quartier;
 use Doctrine\ORM\EntityManagerInterface;
-use Symfony\Component\Validator\Constraints\Bic;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use ApiPlatform\Core\DataPersister\DataPersisterInterface;
 use App\Entity\Gestionnaire;
 use App\Repository\TailleBoissonRepository;
-use GMP;
+use App\Services\CommandeService;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 
 class CommandeDataPersister implements DataPersisterInterface
 {
   
-    public function __construct(private EntityManagerInterface $entityManager, private TokenStorageInterface $token, private TailleBoissonRepository $tailleBoissonRepository)
-    {
-    }
+    public function __construct(private EntityManagerInterface $entityManager, private TokenStorageInterface $token, private TailleBoissonRepository $tailleBoissonRepository, private CommandeService $commandeService){}
 
     public function persist($data)
     {
+        $this->commandeService->calculPrix($data);
+        $this->commandeService->quantiteChoisieVsQuantiteMenu($data);
+        dd($data);
         $user = $this->token->getToken()->getUser();
 
         if($user instanceof Client)
@@ -33,16 +32,8 @@ class CommandeDataPersister implements DataPersisterInterface
         elseif($user instanceof Gestionnaire)
             $data->setGestionnaire($user);
 
-        //------------------------------y'a til un burger ou un menu d'abord ?
         $lignesDeCommandes = $data->getCommandeProduits();
-        $found = false;
-        foreach($lignesDeCommandes as $ldc)
-            if($ldc->getProduit() instanceof Menu or $ldc->getProduit() instanceof Burger)
-                $found = true;  
         
-        if(!$found)
-            return new JsonResponse( ["error" => "Commande sans Burger ou Menu !"], 400);
-   
 
         //----------------------------------------------------------------------------YA DES BOISSONS DANS LES MENUS ?
         foreach($lignesDeCommandes as $ldc)
@@ -92,28 +83,10 @@ class CommandeDataPersister implements DataPersisterInterface
         }
 
         //----------------------------------------------------------------------------YA TIL DES COMPLEMENTS BOISSONS DANS LES COMMANDES ?
-        $complementsBoissons = $data->getCommandeTailleBoissons();
-        $prixComplements = 0;
-        foreach($complementsBoissons as $complementBoisson)
-        {
-            if($complementBoisson->getTailleBoisson()->getQuantiteStock() >= $complementBoisson->getQuantite())
-                $prixComplements += $complementBoisson->getQuantite() * $complementBoisson->getTailleBoisson()->getPrix();
-            else
-                return new JsonResponse( ["error" => "Il ne reste que ".$complementBoisson->getTailleBoisson()->getQuantiteStock()." ".$complementBoisson->getTailleBoisson()->getBoisson()->getNom()." ".$complementBoisson->getTailleBoisson()->getTaille()->getNom(). " en stock!"], 400);
-
-        }
             
         //----------------------------------------------------------------------------Prix total commande 
-        $prix = 0;
-        foreach($lignesDeCommandes as $ldc)
-            $prix += $ldc->getQuantite() * $ldc->getProduit()->getPrix() ; 
-
-        $zone = $data->getZone();
-        if($zone)
-            $prix += $zone->getPrix();
-            
-        $data->setPrix($prix + $prixComplements);
-
+        $this->commandeService->calculPrix($data);
+       
         //----------------------------------------------------------------------------
 
         dd($data);

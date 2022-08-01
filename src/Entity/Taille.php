@@ -31,9 +31,8 @@ class Taille
 
     #[Assert\NotBlank(message: "Ce champ est requis !")]
     #[ORM\Column(type: 'string', length: 20, unique: true)]
-    #[Groups(["taille_boisson:read", "menu:detail", "taille:read", "taille:write"])]
+    #[Groups(["taille_boisson:read", "menu:detail", "taille:read", "taille:write", "produit:detail"])]
     private $nom;
-
 
     #[Assert\NotBlank(message: "Ce champ est requis !")]
     #[Assert\Positive(message: "Le prix doit être supérieur à 0 !")]

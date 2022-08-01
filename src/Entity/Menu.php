@@ -77,18 +77,21 @@ class Menu extends Produit
     protected $imageWrapper;
 
     #[Assert\Valid()]
-    #[Groups(["menu:write"])]
+    #[SerializedName("frites")]
+    #[Groups(["menu:write", "produit:detail"])]
     #[ORM\OneToMany(mappedBy: 'menu', targetEntity: MenuFrite::class, cascade: ["persist"])]
     private $menuFrites;
 
-    #[Groups(["menu:write"])]
+    #[Groups(["menu:write", "produit:detail"])]
     #[Assert\Valid()]
     #[Assert\Count(min:1, minMessage: "Renseignez le burger !")]
     #[ORM\OneToMany(mappedBy: 'menu', targetEntity: MenuBurger::class, cascade: ["persist"])]
+    #[SerializedName("burgers")]
     private $menuBurgers;
 
     #[Assert\Valid()]
-    #[Groups(["menu:write"])]
+    #[SerializedName("tailles")]
+    #[Groups(["menu:write", "produit:detail"])]
     #[ORM\OneToMany(mappedBy: 'menu', targetEntity: MenuTaille::class, cascade: ["persist"])]
     private $menuTailles;
 
@@ -102,6 +105,7 @@ class Menu extends Produit
         $this->menuBurgers = new ArrayCollection();
         $this->menuTailles = new ArrayCollection();
         $this->commandeMenus = new ArrayCollection();
+        $this->categorie = "menu";
     }
   
   

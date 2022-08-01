@@ -70,6 +70,7 @@ class Frite extends Produit
         parent::__construct();
         $this->menuFrites = new ArrayCollection();
         $this->commandeFrites = new ArrayCollection();
+        $this->categorie = "frite";
     }
 
     /**

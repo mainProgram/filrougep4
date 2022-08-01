@@ -30,30 +30,32 @@ use Symfony\Component\Serializer\Annotation\Groups;
     // ] 
     collectionOperations:[
         "get" => [
-            "openapi_context" => ["summary"=>"hidden"]
-        ]
+            // "openapi_context" => ["summary"=>"hidden"]
+            "normalization_context" => [
+                "groups" => ["taille_boisson:read"]
+            ]
+        ],
     ] ,
     itemOperations:[
-        "get" => [
-            "openapi_context" => ["summary"=>"hidden"]
-        ]
+        "get",
+        "put"
     ]
 )]
 class TailleBoisson
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
-    #[Groups(["menu:write"])]
+    #[Groups(["menu:write", "taille_boisson:read"])]
     #[ORM\Column(type: 'integer')]
     private $id;
 
-    #[Groups([ "taille_boisson:read"])]
+    #[Groups(["taille_boisson:read"])]
     #[ORM\Column(type: 'float')]
     private $prix;
 
     #[Assert\NotNull(message: "Renseignez la quantité en stock !")]
     #[Assert\Positive(message: "La quantité doit être supérieure à 0 !")]
-    #[Groups(["boisson:write"])]
+    #[Groups(["boisson:write", "taille_boisson:read"])]
     #[ORM\Column(type: 'integer', nullable: true)]
     private $quantiteStock;
 
@@ -70,9 +72,19 @@ class TailleBoisson
     #[ORM\OneToMany(mappedBy: 'tailleBoisson', targetEntity: CommandeTailleBoisson::class)]
     private $commandeTailleBoissons;
 
+    #[ORM\OneToMany(mappedBy: 'tailleBoisson', targetEntity: CommandeMenuTailleBoisson::class)]
+    private $commandeMenuTailleBoissons;
+
+    #[Groups(["taille_boisson:read"])]
+    #[ORM\Column(type: 'blob', nullable: true)]
+    private $image;
+
+    private $imageWrapper;
+
     public function __construct()
     {
         $this->commandeTailleBoissons = new ArrayCollection();
+        $this->commandeMenuTailleBoissons = new ArrayCollection();
     }
 
 
@@ -166,6 +178,68 @@ class TailleBoisson
                 $commandeTailleBoisson->setTailleBoisson(null);
             }
         }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, CommandeMenuTailleBoisson>
+     */
+    public function getCommandeMenuTailleBoissons(): Collection
+    {
+        return $this->commandeMenuTailleBoissons;
+    }
+
+    public function addCommandeMenuTailleBoisson(CommandeMenuTailleBoisson $commandeMenuTailleBoisson): self
+    {
+        if (!$this->commandeMenuTailleBoissons->contains($commandeMenuTailleBoisson)) {
+            $this->commandeMenuTailleBoissons[] = $commandeMenuTailleBoisson;
+            $commandeMenuTailleBoisson->setTailleBoisson($this);
+        }
+
+        return $this;
+    }
+
+    public function removeCommandeMenuTailleBoisson(CommandeMenuTailleBoisson $commandeMenuTailleBoisson): self
+    {
+        if ($this->commandeMenuTailleBoissons->removeElement($commandeMenuTailleBoisson)) {
+            // set the owning side to null (unless already changed)
+            if ($commandeMenuTailleBoisson->getTailleBoisson() === $this) {
+                $commandeMenuTailleBoisson->setTailleBoisson(null);
+            }
+        }
+
+        return $this;
+    }
+
+    public function getImage()
+    {
+        return is_resource($this->image) ? (base64_encode(stream_get_contents($this->image))) : $this->image;
+    }
+
+    public function setImage($image): self
+    {
+        $this->image = $image;
+
+        return $this;
+    }
+
+    /**
+     * Get the value of imageWrapper
+     */ 
+    public function getImageWrapper()
+    {
+        return $this->imageWrapper;
+    }
+
+    /**
+     * Set the value of imageWrapper
+     *
+     * @return  self
+     */ 
+    public function setImageWrapper($imageWrapper)
+    {
+        $this->imageWrapper = $imageWrapper;
 
         return $this;
     }

@@ -18,8 +18,8 @@ class CatalogueDataProvider implements ContextAwareCollectionDataProviderInterfa
     
     public function getCollection(string $resourceClass, string $operationName = null, array $context = [])
     {
-        $tab[] = $this->bgrepo->findBy(["isEtat" => 1]);
-        $tab[] = $this->menurepo->findBy(["isEtat" => 1]);     
+        $tab["burgers"] = $this->bgrepo->findBy(["isEtat" => 1]);
+        $tab["menus"] = $this->menurepo->findBy(["isEtat" => 1]);     
         return  $tab;
     }
 

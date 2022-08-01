@@ -28,7 +28,7 @@ class MenuTaille
     #[ORM\Column(type: 'integer')]
     private $id;
 
-    #[Groups(["menu:write"])]
+    #[Groups(["menu:write", "produit:detail"])]
     #[Assert\Positive(message: "La quantité doit être supérieure à 0 !")]
     #[ORM\Column(type: 'integer', nullable: true)]
     private $quantite = 1;
@@ -36,7 +36,7 @@ class MenuTaille
     #[ORM\ManyToOne(targetEntity: Menu::class, inversedBy: 'menuTailles')]
     private $menu;
 
-    #[Groups(["menu:write"])]
+    #[Groups(["menu:write", "produit:detail"])]
     #[Assert\NotNull(message: "Renseignez la taille !")]
     #[ORM\ManyToOne(targetEntity: Taille::class, inversedBy: 'menuTailles')]
     private $taille;

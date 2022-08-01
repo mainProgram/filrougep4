@@ -90,6 +90,7 @@ class Burger extends Produit
         parent::__construct();
         $this->menuBurgers = new ArrayCollection();
         $this->commandeBurgers = new ArrayCollection();
+        $this->categorie = "burger";
     }
 
     /**

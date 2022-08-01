@@ -2,17 +2,18 @@
 
 namespace App\Entity;
 
-use Doctrine\Common\Collections\Collection;
+use App\Entity\User;
 use Doctrine\ORM\Mapping as ORM;
+use App\Controller\ImageController;
 use App\Repository\ProduitRepository;
 use ApiPlatform\Core\Annotation\ApiFilter;
+use Doctrine\Common\Collections\Collection;
 use ApiPlatform\Core\Annotation\ApiResource;
 use Doctrine\Common\Collections\ArrayCollection;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\SearchFilter;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\NumericFilter;
-use App\Controller\ImageController;
 
 #[ORM\Entity(repositoryClass: ProduitRepository::class)]
 #[ORM\InheritanceType("JOINED")]
@@ -55,7 +56,8 @@ use App\Controller\ImageController;
     itemOperations:[
         "get" => [
             "openapi_context" => ["summary"=>"hidden"]
-        ]
+        ],
+        "put"
     ] 
 )]
 class Produit
@@ -88,10 +90,14 @@ class Produit
     protected $user;
 
     #[ORM\Column(type: 'blob', nullable: true)]
-    #[Groups(["produit:read", "produit:detail", "produit:write"])]
+    #[Groups(["produit:read",  "produit:write"])]
     protected $image;
 
     private $imageWrapper;
+
+    #[Groups(["produit:read"])]
+    #[ORM\Column(type: 'string', length: 50, nullable: true)]
+    private $categorie;
  
     public function __construct()
     {
@@ -169,7 +175,9 @@ class Produit
         // @fclose($this->image);
         // return base64_encode($photo);
         // dd(utf8_encode(base64_encode($this->image)));
-        return utf8_encode(base64_encode($this->image));
+        return is_resource($this->image) ? (base64_encode(stream_get_contents($this->image))) : $this->image;
+
+        // return ($this->image);
         // return utf8_encode(base64_encode($this->image));
     }
 
@@ -180,16 +188,38 @@ class Produit
         return $this;
     }
 
-    public function getImageWrapper(): ?object
+   
+
+
+    /**
+     * Get the value of imageWrapper
+     */ 
+    public function getImageWrapper()
     {
         return $this->imageWrapper;
     }
 
-    public function setImageWrapper(?object $imageWrapper): self
+    /**
+     * Set the value of imageWrapper
+     *
+     * @return  self
+     */ 
+    public function setImageWrapper($imageWrapper)
     {
         $this->imageWrapper = $imageWrapper;
 
         return $this;
     }
 
+    public function getCategorie(): ?string
+    {
+        return $this->categorie;
+    }
+
+    public function setCategorie(?string $categorie): self
+    {
+        $this->categorie = $categorie;
+
+        return $this;
+    }
 }

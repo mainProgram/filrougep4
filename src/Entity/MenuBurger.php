@@ -30,14 +30,14 @@ class MenuBurger
     #[ORM\Column(type: 'integer')]
     private $id;
 
-    #[Groups(["menu:write"])]
+    #[Groups(["menu:write", "produit:detail"])]
     #[Assert\Positive(message: "La quantité doit être supérieure à 0 !")]
     #[ORM\Column(type: 'integer', nullable: true)]
     private $quantite = 1;
 
     #[ORM\ManyToOne(targetEntity: Burger::class, inversedBy: 'menuBurgers')]
     #[Assert\NotNull(message: "Renseignez le burger !")]
-    #[Groups(["menu:write"])]
+    #[Groups(["menu:write", "produit:detail"])]
     private $burger;
 
     #[ORM\ManyToOne(targetEntity: Menu::class, inversedBy: 'menuBurgers')]

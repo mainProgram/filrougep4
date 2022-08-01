@@ -11,6 +11,7 @@ use App\Entity\Produit;
 use App\Services\FunctionService;
 use Doctrine\ORM\EntityManagerInterface;
 use ApiPlatform\Core\DataPersister\DataPersisterInterface;
+use App\Entity\TailleBoisson;
 use Symfony\Component\HttpFoundation\Request;
 
 class ProduitDataPersister implements DataPersisterInterface
@@ -24,12 +25,12 @@ class ProduitDataPersister implements DataPersisterInterface
     {
         // if($data instanceof Burger)
         //     dd("hi");
-        return $data instanceof Burger or $data instanceof Frite or $data instanceof Boisson or $data instanceof Menu  or $data instanceof Produit;
+        return $data instanceof Burger or $data instanceof Frite or $data instanceof Boisson or $data instanceof Menu  or $data instanceof Produit or $data instanceof TailleBoisson;
     }
 
     public function persist($data)
     {
-        dd($data);
+        // dd($data);
 
         if($data instanceof Boisson)
         {
@@ -39,13 +40,14 @@ class ProduitDataPersister implements DataPersisterInterface
         }
         elseif ($data instanceof Menu)
         {
-
             $this->service->calculPrix($data);
         }
 
-        // $file = $data->getImageWrapper();
-        // $img = file_get_contents($file);
-        // $data->setImage($img);
+        $file = $data->getImageWrapper();
+        $img = file_get_contents($file);
+        $data->setImage($img);
+        // dd($data);
+
 
         // $file = $data->getImageWrapper()->getRealPath();
         // $img = stream_get_contents(fopen($file, "rb"));

@@ -11,8 +11,10 @@ api_platform:
         json:     ['application/json'] #Quand je testais PATCH il ne supportait pas ['application/merge+json']
     swagger:
         versions: [3]
+    # defaults:
+    #     pagination_items_per_page: 10
     defaults:
-        pagination_items_per_page: 10
+        pagination_enabled: false
     http_cache:
         invalidation:
             enabled: true
