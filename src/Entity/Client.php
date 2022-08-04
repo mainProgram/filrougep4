@@ -2,11 +2,13 @@
 
 namespace App\Entity;
 
-use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use App\Repository\ClientRepository;
+use Doctrine\Common\Collections\Collection;
 use ApiPlatform\Core\Annotation\ApiResource;
+use ApiPlatform\Core\Annotation\ApiSubresource;
+use Doctrine\Common\Collections\ArrayCollection;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\Entity(repositoryClass: ClientRepository::class)]
 #[ApiResource(
@@ -20,14 +22,14 @@ use ApiPlatform\Core\Annotation\ApiResource;
         ]
         ],
     itemOperations:[
-        "get" => [
-            "openapi_context" => ["summary"=>"hidden"]
-        ]
-    ] 
+        "get" 
+    ]
 )]
 class Client extends User
 {
+    #[ApiSubresource()]
     #[ORM\OneToMany(mappedBy: 'client', targetEntity: Commande::class)]
+    #[Groups(["commande:client:read"])]
     private $commandes;
 
     public function __construct()

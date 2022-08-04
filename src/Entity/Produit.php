@@ -68,12 +68,12 @@ class Produit
     #[Groups(["produit:detail", "burger:read", "menu:write"])]
     protected $id;
 
-    #[Groups(["produit:detail", "produit:read","produit:write", "menu:detail","taille_boisson:read", "boisson:write", "commande:read"])]
+    #[Groups(["produit:detail", "produit:read","produit:write", "menu:detail","complement:read", "boisson:write", "commande:list", "boisson:write", "commande:client:detail"])]
     #[ORM\Column(type: 'string', length: 50, unique: true)]
     #[Assert\NotBlank(message: "Ce champ est requis !")]
     protected $nom;
 
-    #[Groups(["produit:detail", "produit:read"])]
+    #[Groups(["produit:detail", "produit:read", "commande:client:detail"])]
     #[ORM\Column(type: 'float', nullable: true)]
     protected $prix;
 
@@ -90,12 +90,12 @@ class Produit
     protected $user;
 
     #[ORM\Column(type: 'blob', nullable: true)]
-    #[Groups(["produit:read",  "produit:write"])]
+    #[Groups(["produit:read",  "produit:write", "complement:read", "boisson:write", "commande:client:detail"])]
     protected $image;
 
     private $imageWrapper;
 
-    #[Groups(["produit:read"])]
+    #[Groups(["produit:read", "complement:read"])]
     #[ORM\Column(type: 'string', length: 50, nullable: true)]
     private $categorie;
  

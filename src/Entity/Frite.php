@@ -53,9 +53,11 @@ use Symfony\Component\Serializer\Annotation\Groups;
 )]
 class Frite extends Produit
 {
+    #[Groups(["complement:read"])]
+    protected $id;
 
     #[Assert\NotBlank(message: "Ce champ est requis !")]
-    #[Groups(["produit:write"])]
+    #[Groups(["produit:write", "complement:read"])]
     #[Assert\Positive(message: "Le prix doit être supérieur à 0 !")]
     protected $prix;
 

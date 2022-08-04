@@ -2,9 +2,10 @@
 
 namespace App\Entity;
 
-use App\Repository\CommandeFriteRepository;
-use Symfony\Component\Validator\Constraints as Assert;
 use Doctrine\ORM\Mapping as ORM;
+use App\Repository\CommandeFriteRepository;
+use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: CommandeFriteRepository::class)]
 class CommandeFrite
@@ -16,6 +17,7 @@ class CommandeFrite
 
     #[ORM\Column(type: 'integer')]
     #[Assert\NotBlank(message: "Ce champ est requis !")]
+    #[Groups(["commande:client:detail"])]
     #[Assert\Positive(message: "La quantité doit être supérieure à 0 !")]
     private $quantite = 1;
 
@@ -23,10 +25,11 @@ class CommandeFrite
     private $prix;
 
     #[Assert\NotNull(message: "Renseigner des frites !")]
+    #[Groups(["commande:client:detail"])]
     #[ORM\ManyToOne(targetEntity: Frite::class, inversedBy: 'commandeFrites')]
     private $frite;
 
-    #[ORM\ManyToOne(targetEntity: Commande::class, inversedBy: 'commandeFrites')]
+    #[ORM\ManyToOne(targetEntity: Commande::class, inversedBy: 'commandeFrites', cascade: ["persist"])]
     private $commande;
 
     public function getId(): ?int

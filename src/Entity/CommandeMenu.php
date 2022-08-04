@@ -2,11 +2,12 @@
 
 namespace App\Entity;
 
-use App\Repository\CommandeMenuRepository;
-use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Collection;
-use Symfony\Component\Validator\Constraints as Assert;
 use Doctrine\ORM\Mapping as ORM;
+use App\Repository\CommandeMenuRepository;
+use Doctrine\Common\Collections\Collection;
+use Doctrine\Common\Collections\ArrayCollection;
+use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: CommandeMenuRepository::class)]
 class CommandeMenu
@@ -18,11 +19,13 @@ class CommandeMenu
 
     #[ORM\Column(type: 'integer')]
     #[Assert\NotBlank(message: "Ce champ est requis !")]
+    #[Groups(["commande:client:detail"])]
     #[Assert\Positive(message: "La quantité doit être supérieure à 0 !")]
     private $quantite = 1;
 
     #[Assert\NotNull(message: "Renseigner un menu !")]
     #[ORM\ManyToOne(targetEntity: Menu::class, inversedBy: 'commandeMenus')]
+    #[Groups(["commande:client:detail"])]
     private $menu;
 
     #[ORM\ManyToOne(targetEntity: Commande::class, inversedBy: 'commandeMenus')]
@@ -32,7 +35,7 @@ class CommandeMenu
     private $prix;
 
     #[Assert\Valid()]
-    #[ORM\OneToMany(mappedBy: 'commandeMenu', targetEntity: CommandeMenuTailleBoisson::class)]
+    #[ORM\OneToMany(mappedBy: 'commandeMenu', targetEntity: CommandeMenuTailleBoisson::class, cascade: ["persist"])]
     private $commandeMenuTailleBoissons;
 
     public function __construct()

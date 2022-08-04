@@ -43,7 +43,7 @@ class Zone
 
     #[Assert\NotBlank(message: "Ce champ est requis !")]
     #[Assert\Positive(message: "Le prix doit être supérieur à 0 !")]
-    #[Groups(["zone:read", "zone:write"])]
+    #[Groups(["zone:read", "zone:write", "commande:client:detail"])]
     #[ORM\Column(type: 'float')]
     private $prix;
 

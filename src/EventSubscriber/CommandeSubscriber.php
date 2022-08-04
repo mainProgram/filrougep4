@@ -30,16 +30,16 @@ class CommandeSubscriber
 
     public function postUpdate(Commande $commande, LifecycleEventArgs $event): void
     {
-        $gestionnaire = $this->token->getToken()->getUser();
+        // $gestionnaire = $this->token->getToken()->getUser();
 
         $numero = "#".$commande->getId();
 
         $commande->setNumero($numero);
 
-        $commande->setGestionnaire($gestionnaire);
+        // $commande->setGestionnaire($gestionnaire);
 
-        if($commande->getEtat() == "valide")
-            dd("Etat valide");
+        // if($commande->getEtat() == "valide")
+        //     dd("Etat valide");
 
         $this->entityManager->persist($commande);
         $this->entityManager->flush();

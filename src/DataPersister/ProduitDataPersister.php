@@ -34,6 +34,9 @@ class ProduitDataPersister implements DataPersisterInterface
 
         if($data instanceof Boisson)
         {
+            $nom = $data->getNom() . " " . $data->getTailleBoissons()[0]->getTaille()->getNom();
+            $data->getTailleBoissons()[0]->setNom($nom);
+
             $prix = $data->getTailleBoissons()[0]->getTaille()->getPrix();
             $data->getTailleBoissons()[0]->setPrix($prix);
             $data->setPrix((0));
@@ -44,8 +47,10 @@ class ProduitDataPersister implements DataPersisterInterface
         }
 
         $file = $data->getImageWrapper();
-        $img = file_get_contents($file);
-        $data->setImage($img);
+        if($file){
+            $img = file_get_contents($file);
+            $data->setImage($img);
+        }
         // dd($data);
 
 

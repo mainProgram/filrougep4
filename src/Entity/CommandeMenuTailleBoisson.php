@@ -20,7 +20,7 @@ class CommandeMenuTailleBoisson
     #[ORM\Column(type: 'integer', nullable: true)]
     private $quantite = 1;
 
-    #[ORM\ManyToOne(targetEntity: CommandeMenu::class, inversedBy: 'commandeMenuTailleBoissons')]
+    #[ORM\ManyToOne(targetEntity: CommandeMenu::class, inversedBy: 'commandeMenuTailleBoissons', cascade: ["persist"])]
     private $commandeMenu;
 
     #[Assert\NotNull(message: "Renseigner une boisson!")]

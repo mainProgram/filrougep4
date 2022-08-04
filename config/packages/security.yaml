@@ -35,7 +35,9 @@ security:
     access_control:
         - { path: ^/api/login, roles: PUBLIC_ACCESS }
         - { path: ^/api/sign_up$, roles: PUBLIC_ACCESS }
-        - { path: ^/api/taille_boissons, roles: PUBLIC_ACCESS }
+        - { path: ^/api/clients, roles: PUBLIC_ACCESS }
+        - { path: ^/api/complements, roles: PUBLIC_ACCESS }
+        - { path: ^/api/commandes, roles: PUBLIC_ACCESS }
         - { path: ^/api/zones, roles: PUBLIC_ACCESS }
         - { path: ^/api$, roles: PUBLIC_ACCESS }
         - { path: ^/api/burgers/, roles: PUBLIC_ACCESS, methods: [GET] }

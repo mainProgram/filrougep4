@@ -6,10 +6,7 @@ use App\Entity\Complement;
 use App\Repository\TailleBoissonRepository;
 use ApiPlatform\Core\DataProvider\RestrictedDataProviderInterface;
 use ApiPlatform\Core\DataProvider\ContextAwareCollectionDataProviderInterface;
-use App\Entity\TailleBoisson;
 use App\Repository\FriteRepository;
-use Doctrine\ORM\Query\Expr\From;
-use Egulias\EmailValidator\Warning\TLD;
 
 class ComplementDataProvider implements ContextAwareCollectionDataProviderInterface, RestrictedDataProviderInterface {
 
@@ -21,8 +18,23 @@ class ComplementDataProvider implements ContextAwareCollectionDataProviderInterf
     
     public function getCollection(string $resourceClass, string $operationName = null, array $context = [])
     {
-        $tab[] = $this->friterepo->findAll();
-        $tab[] = $this->tbrepo->findAll();     
+        $qb = $this->tbrepo->createQueryBuilder('tbrepo')->where('tbrepo.taille = :taille')->setParameter('taille', 1)->andWhere('tbrepo.quantiteStock > 0');
+        $query = $qb->getQuery();
+        $lesTaillesPMBoissonsDispo = $query->execute();
+
+        $qb = $this->tbrepo->createQueryBuilder('tbrepo')->where('tbrepo.taille = :taille')->setParameter('taille', 2)->andWhere('tbrepo.quantiteStock > 0');
+        $query = $qb->getQuery();
+        $lesTaillesGMBoissonsDispo = $query->execute();
+
+        // $qb = $this->tbrepo->createQueryBuilder('tbrepo')->where('tbrepo.quantiteStock > 0');
+        // $query = $qb->getQuery();
+        // $boissons = $query->execute();
+
+
+        $tab["pm"] = $lesTaillesPMBoissonsDispo;
+        $tab["gm"] = $lesTaillesGMBoissonsDispo;
+        $tab["frites"] = $this->friterepo->findAll();
+        // $tab["boissons"] = $boissons;
         return  $tab;
     }
 

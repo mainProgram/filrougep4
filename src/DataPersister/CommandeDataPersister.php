@@ -22,65 +22,63 @@ class CommandeDataPersister implements DataPersisterInterface
 
     public function persist($data)
     {
-        $this->commandeService->calculPrix($data);
         $this->commandeService->quantiteChoisieVsQuantiteMenu($data);
-        dd($data);
-        $user = $this->token->getToken()->getUser();
+        // $user = $this->token->getToken()->getUser();
 
-        if($user instanceof Client)
-            $data->setClient($user);
-        elseif($user instanceof Gestionnaire)
-            $data->setGestionnaire($user);
+        // if($user instanceof Client)
+        //     $data->setClient($user);
+        // elseif($user instanceof Gestionnaire)
+        //     $data->setGestionnaire($user);
 
-        $lignesDeCommandes = $data->getCommandeProduits();
+        // $lignesDeCommandes = $data->getCommandeProduits();
         
 
-        //----------------------------------------------------------------------------YA DES BOISSONS DANS LES MENUS ?
-        foreach($lignesDeCommandes as $ldc)
-        if($ldc->getProduit() instanceof Menu)
-        {
-            //----------------------------------------------------------------------------Quantité choisie == quantité du menu ?
-            $taillesDuMenu = $ldc->getProduit()->getMenuTailles();
-            $quantiteBoissons = 0 ;  
-            foreach($taillesDuMenu as $t)
-                $quantiteBoissons += $t->getQuantite();
+        // //----------------------------------------------------------------------------YA DES BOISSONS DANS LES MENUS ?
+        // foreach($lignesDeCommandes as $ldc)
+        // if($ldc->getProduit() instanceof Menu)
+        // {
+        //     //----------------------------------------------------------------------------Quantité choisie == quantité du menu ?
+        //     $taillesDuMenu = $ldc->getProduit()->getMenuTailles();
+        //     $quantiteBoissons = 0 ;  
+        //     foreach($taillesDuMenu as $t)
+        //         $quantiteBoissons += $t->getQuantite();
 
-            $boissonsChoisies = $ldc->getTailleBoissons();
+        //     $boissonsChoisies = $ldc->getTailleBoissons();
 
-            if(count($boissonsChoisies) != $quantiteBoissons)
-                return new JsonResponse( ["error" => "Le menu ".$ldc->getProduit()->getNom()." a ".count($taillesDuMenu)." boisson (s)!"], 400);
+        //     if(count($boissonsChoisies) != $quantiteBoissons)
+        //         return new JsonResponse( ["error" => "Le menu ".$ldc->getProduit()->getNom()." a ".count($taillesDuMenu)." boisson (s)!"], 400);
 
 
-            foreach($taillesDuMenu as $taille)
-            {
+        //     foreach($taillesDuMenu as $taille)
+        //     {
                
-                $idTaille = $taille->getTaille()->getId();
-                $quantite = $taille->getQuantite();
-                $combienDeModeles = [];
+        //         $idTaille = $taille->getTaille()->getId();
+        //         $quantite = $taille->getQuantite();
+        //         $combienDeModeles = [];
 
-                //----------------------------------------------------------------------------Nombre de PM dans le menu == nombre de PM choisi
-                foreach($boissonsChoisies as $bc)
-                    if($bc->getTaille()->getId() == $idTaille)
-                        $combienDeModeles[] = $bc;
+        //         //----------------------------------------------------------------------------Nombre de PM dans le menu == nombre de PM choisi
+        //         foreach($boissonsChoisies as $bc)
+        //             if($bc->getTaille()->getId() == $idTaille)
+        //                 $combienDeModeles[] = $bc;
                 
-                if($quantite != count($combienDeModeles))
-                    return new JsonResponse( ["error" => "Le menu ".$ldc->getProduit()->getNom()." a ".$quantite." boisson (s) ".$taille->getTaille()->getNom()."!"], 400);
+        //         if($quantite != count($combienDeModeles))
+        //             return new JsonResponse( ["error" => "Le menu ".$ldc->getProduit()->getNom()." a ".$quantite." boisson (s) ".$taille->getTaille()->getNom()."!"], 400);
 
-                //----------------------------------------------------------------------------Lim choisir disponible ne ?
-                $qb = $this->tailleBoissonRepository->createQueryBuilder('tbrepo')->where('tbrepo.taille = :taille')->setParameter('taille', $idTaille)->andWhere('tbrepo.quantiteStock > 0');
-                $query = $qb->getQuery();
-                $lesTaillesBoissonsDispo = $query->execute();
+        //         //----------------------------------------------------------------------------Lim choisir disponible ne ?
+        //         $qb = $this->tailleBoissonRepository->createQueryBuilder('tbrepo')->where('tbrepo.taille = :taille')->setParameter('taille', $idTaille)->andWhere('tbrepo.quantiteStock > 0');
+        //         $query = $qb->getQuery();
+        //         $lesTaillesBoissonsDispo = $query->execute();
 
-                foreach($combienDeModeles as $bc)
-                    if(!in_array($bc, $lesTaillesBoissonsDispo))
-                        return new JsonResponse( ["error" => "La boisson ".$bc->getBoisson()->getNom()." en ".$bc->getTaille()->getNom()." n'est pas disponible !"], 400);               
+        //         foreach($combienDeModeles as $bc)
+        //             if(!in_array($bc, $lesTaillesBoissonsDispo))
+        //                 return new JsonResponse( ["error" => "La boisson ".$bc->getBoisson()->getNom()." en ".$bc->getTaille()->getNom()." n'est pas disponible !"], 400);               
 
-                //----------------------------------------------------------------------------Lim choisir stock bi amnafi ?
-                // foreach($boissonsChoisies as $bc)
-                //     if(!in_array($bc, $lesTaillesBoissonsDispo))
+        //         //----------------------------------------------------------------------------Lim choisir stock bi amnafi ?
+        //         // foreach($boissonsChoisies as $bc)
+        //         //     if(!in_array($bc, $lesTaillesBoissonsDispo))
                       
-            }
-        }
+        //     }
+        // }
 
         //----------------------------------------------------------------------------YA TIL DES COMPLEMENTS BOISSONS DANS LES COMMANDES ?
             
@@ -89,7 +87,7 @@ class CommandeDataPersister implements DataPersisterInterface
        
         //----------------------------------------------------------------------------
 
-        dd($data);
+        // dd($data);
         $this->entityManager->persist($data);       
         $this->entityManager->flush();     
     }

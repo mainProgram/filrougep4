@@ -21,7 +21,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
     //         "method" => "get",
     //         "status" => 200,
     //         "normalization_context" => [
-    //             "groups" => ["taille_boisson:read"]
+    //             "groups" => ["complement:read"]
     //         ]
     //     ], "post"
     // ],
@@ -32,9 +32,14 @@ use Symfony\Component\Serializer\Annotation\Groups;
         "get" => [
             // "openapi_context" => ["summary"=>"hidden"]
             "normalization_context" => [
-                "groups" => ["taille_boisson:read"]
+                "groups" => ["complement:read"]
             ]
         ],
+        "post" => [
+            "denormalization_context" => [
+                "groups" => ["taille_boisson:write"]
+            ]
+        ]
     ] ,
     itemOperations:[
         "get",
@@ -45,27 +50,27 @@ class TailleBoisson
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
-    #[Groups(["menu:write", "taille_boisson:read"])]
+    #[Groups(["menu:write", "complement:read", "commande:read"])]
     #[ORM\Column(type: 'integer')]
     private $id;
 
-    #[Groups(["taille_boisson:read"])]
+    #[Groups(["complement:read", "commande:client:detail"])]
     #[ORM\Column(type: 'float')]
     private $prix;
 
     #[Assert\NotNull(message: "Renseignez la quantité en stock !")]
     #[Assert\Positive(message: "La quantité doit être supérieure à 0 !")]
-    #[Groups(["boisson:write", "taille_boisson:read"])]
+    #[Groups(["taille_boisson:write", "complement:read"])]
     #[ORM\Column(type: 'integer', nullable: true)]
     private $quantiteStock;
 
-    #[Groups(["boisson:write", "taille_boisson:read"])]
+    #[Groups(["taille_boisson:write", "complement:read"])]
     #[Assert\NotNull(message: "Renseignez la taille !")]
     #[ORM\ManyToOne(targetEntity: Taille::class, inversedBy: 'tailleBoissons')]
     private $taille;
 
     #[Assert\NotNull(message: "Renseignez la boisson !")]
-    #[Groups(["taille_boisson:read"])]
+    #[Groups(["taille_boisson:write", "complement:read"])]
     #[ORM\ManyToOne(targetEntity: Boisson::class, inversedBy: 'tailleBoissons')]
     private $boisson;
 
@@ -75,11 +80,16 @@ class TailleBoisson
     #[ORM\OneToMany(mappedBy: 'tailleBoisson', targetEntity: CommandeMenuTailleBoisson::class)]
     private $commandeMenuTailleBoissons;
 
-    #[Groups(["taille_boisson:read"])]
+    #[Groups(["complement:read", "commande:client:detail"])]
     #[ORM\Column(type: 'blob', nullable: true)]
     private $image;
 
+    #[Groups(["taille_boisson:write"])]
     private $imageWrapper;
+
+    #[Groups(["complement:read", "commande:client:detail"])]
+    #[ORM\Column(type: 'string', length: 50, nullable: true)]
+    private $nom;
 
     public function __construct()
     {
@@ -240,6 +250,18 @@ class TailleBoisson
     public function setImageWrapper($imageWrapper)
     {
         $this->imageWrapper = $imageWrapper;
+
+        return $this;
+    }
+
+    public function getNom(): ?string
+    {
+        return $this->nom;
+    }
+
+    public function setNom(?string $nom): self
+    {
+        $this->nom = $nom;
 
         return $this;
     }

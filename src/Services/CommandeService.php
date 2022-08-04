@@ -25,7 +25,7 @@ class CommandeService
                     $quantiteBoissons += $menuTaille->getQuantite();
 
                 $boissonsChoisies = $commandeMenu->getCommandeMenuTailleBoissons();
-                dump($quantiteBoissons);
+                // dump($quantiteBoissons);
 
                 if(count($boissonsChoisies) != $quantiteBoissons)
                     return new JsonResponse( ["error" => "Le menu ".$commandeMenu->getMenu()->getNom()." a ".$quantiteBoissons." boisson (s)!"], 400);

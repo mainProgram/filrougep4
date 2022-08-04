@@ -62,9 +62,11 @@ class Boisson extends Produit
   
 
     #[ORM\OneToMany(mappedBy: 'boisson', targetEntity: TailleBoisson::class, cascade: ["persist"])]
-    #[Groups(["boisson:write"])]
+    // #[Groups(["boisson:write"])]
     // #[Assert\Valid()]
     private $tailleBoissons;
+
+ 
 
     public function __construct()
     {

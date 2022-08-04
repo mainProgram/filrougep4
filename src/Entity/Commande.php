@@ -21,6 +21,11 @@ use App\Services\CommandeService;
         "post" => [
             "method" => "post",
             "status" => 201,
+            "normalization_context" => [
+                "groups" => [
+                    "commande:list"
+                ]
+            ]
         ],
         "get" => [
             "method" => "get",
@@ -31,7 +36,31 @@ use App\Services\CommandeService;
                 ]
             ]
         ]
-    ]
+    ],
+    itemOperations:[
+        "get" => [
+            "normalization_context" => [
+                "groups" => [
+                    "commande:client:detail"
+                ]
+            ]
+        ],
+        "put" => [
+            "normalization_context" => [
+                "groups" => [
+                    "commande:list"
+                ]
+            ]
+        ]
+    ],
+    subresourceOperations:[
+        "api_clients_commandes_get_subresource" => [
+            "method" => "GET",
+            "normalization_context" => [
+                "groups" => ["commande:client:read" ]
+            ]
+        ]
+    ] 
 )]
 
 
@@ -42,6 +71,7 @@ class Commande
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
+    #[Groups(["commande:client:read", "commande:list"])]
     #[ORM\Column(type: 'integer')]
     private $id;
 
@@ -55,13 +85,14 @@ class Commande
     #[ORM\ManyToOne(targetEntity: Gestionnaire::class, inversedBy: 'commandes')]
     private $gestionnaire;
 
+    #[Groups(["commande:list", "commande:client:detail"])]
     #[ORM\ManyToOne(targetEntity: Zone::class, inversedBy: 'commandes')]
     private $zone;
 
     #[ORM\OneToOne(targetEntity: Ticket::class, cascade: ['persist', 'remove'])]
     private $ticket;
     
-    #[Groups(["commande:list"])]
+    #[Groups(["commande:list", "commande:client:read", "commande:client:detail"])]
     #[ORM\Column(type: 'string', length: 30)]
     private $etat = "en attente";
     
@@ -69,16 +100,18 @@ class Commande
     #[ORM\Column(type: 'boolean', nullable: true)]
     private $paye;
 
-    #[Groups(["commande:list"])]
+    #[Groups(["commande:list", "commande:client:read", "commande:client:detail"])]
     #[ORM\Column(type: 'float', nullable: true)]
     private $prix;
 
     #[ORM\OneToMany(mappedBy: 'commande', targetEntity: CommandeTailleBoisson::class, cascade: ["persist"])]
     // #[SerializedName("boissons")]
+    #[Groups(["commande:client:detail"])]
     #[Assert\Valid()]
     private $commandeTailleBoissons;
 
-    #[ORM\Column(type: 'date', nullable: true)]
+    #[Groups(["commande:client:read"])]
+    #[ORM\Column(type: 'datetime', nullable: true)]
     private $date;
 
     #[ORM\Column(type: 'string', length: 255, nullable: true)]
@@ -86,14 +119,17 @@ class Commande
 
     #[Assert\Valid()]
     #[ORM\OneToMany(mappedBy: 'commande', targetEntity: CommandeMenu::class, cascade: ["persist"])]
+    #[Groups(["commande:list", "commande:client:detail"])]
     private $commandeMenus;
 
     #[Assert\Valid()]
     #[ORM\OneToMany(mappedBy: 'commande', targetEntity: CommandeFrite::class, cascade: ["persist"])]
+    #[Groups(["commande:list", "commande:client:detail"])]
     private $commandeFrites;
 
     #[Assert\Valid()]
     #[ORM\OneToMany(mappedBy: 'commande', targetEntity: CommandeBurger::class, cascade: ["persist"])]
+    #[Groups(["commande:list", "commande:client:detail"])]
     private $commandeBurgers;
 
   
