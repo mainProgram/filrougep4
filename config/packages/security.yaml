@@ -40,6 +40,7 @@ security:
         - { path: ^/api/complements, roles: PUBLIC_ACCESS }
         - { path: ^/api/commandes, roles: PUBLIC_ACCESS }
         - { path: ^/api/livreurs, roles: PUBLIC_ACCESS }
+        - { path: ^/api/livraisons, roles: PUBLIC_ACCESS }
         - { path: ^/api/zones, roles: PUBLIC_ACCESS }
         - { path: ^/api$, roles: PUBLIC_ACCESS }
         - { path: ^/api/burgers/, roles: PUBLIC_ACCESS, methods: [GET] }

@@ -7,6 +7,7 @@ use App\Repository\LivreurRepository;
 use ApiPlatform\Core\Annotation\ApiFilter;
 use Doctrine\Common\Collections\Collection;
 use ApiPlatform\Core\Annotation\ApiResource;
+use ApiPlatform\Core\Annotation\ApiSubresource;
 use Doctrine\Common\Collections\ArrayCollection;
 use Symfony\Component\Serializer\Annotation\Groups;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\SearchFilter;
@@ -37,6 +38,7 @@ class Livreur extends User
     #[ORM\Column(type: 'string', length: 50, unique: true)]
     private $matriculeMoto;
 
+    #[ApiSubresource()]
     #[Groups(["livreur:detail"])]
     #[ORM\OneToMany(mappedBy: 'livreur', targetEntity: Livraison::class)]
     private $livraisons;

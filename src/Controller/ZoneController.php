@@ -15,13 +15,12 @@ class ZoneController extends AbstractController
     {
         $qb = $zone->createQueryBuilder('zone')
                     ->select('zone.id')
+                    ->addSelect('zone.nom')
                     ->join('App\Entity\Commande', 'com', 'WITH', 'com.zone  = zone.id')
                     ->where('com.etat = ?1')
                     ->setParameter(1, 'termine')
                     ->distinct()
                     ->getQuery();
-
-        // dd($qb->execute());
-        return $qb->execute();
+            return $qb->execute();
     }
 }

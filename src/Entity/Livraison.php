@@ -11,7 +11,8 @@ use Doctrine\Common\Collections\ArrayCollection;
 
 #[ORM\Entity(repositoryClass: LivraisonRepository::class)]
 #[ApiResource(
-    itemOperations:["get", "put"]
+    itemOperations:["get", "put"],
+    collectionOperations:["get", "post"]
 )]
 class Livraison
 {
