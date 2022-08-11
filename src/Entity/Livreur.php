@@ -4,15 +4,18 @@ namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 use App\Repository\LivreurRepository;
+use ApiPlatform\Core\Annotation\ApiFilter;
 use Doctrine\Common\Collections\Collection;
 use ApiPlatform\Core\Annotation\ApiResource;
 use Doctrine\Common\Collections\ArrayCollection;
 use Symfony\Component\Serializer\Annotation\Groups;
+use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\SearchFilter;
 
 #[ORM\Entity(repositoryClass: LivreurRepository::class)]
+#[ApiFilter(SearchFilter::class, properties: ['isDisponible' => 'exact'])]
 #[ApiResource(
-    security: 'is_granted("ROLE_GESTIONNAIRE)',
-    securityMessage : "Vous n'êtes pas autorisé !",
+    // security: 'is_granted("ROLE_GESTIONNAIRE)',
+    // securityMessage : "Vous n'êtes pas autorisé !",
     collectionOperations:[
         "get" => [
             "normalization_context" => ["groups" => ["sign_up:read"]]
@@ -37,6 +40,9 @@ class Livreur extends User
     #[Groups(["livreur:detail"])]
     #[ORM\OneToMany(mappedBy: 'livreur', targetEntity: Livraison::class)]
     private $livraisons;
+
+    #[ORM\Column(type: 'boolean', nullable: true)]
+    private $isDisponible;
 
     public function __construct()
     {
@@ -82,6 +88,18 @@ class Livreur extends User
                 $livraison->setLivreur(null);
             }
         }
+
+        return $this;
+    }
+
+    public function isIsDisponible(): ?bool
+    {
+        return $this->isDisponible;
+    }
+
+    public function setIsDisponible(?bool $isDisponible): self
+    {
+        $this->isDisponible = $isDisponible;
 
         return $this;
     }

@@ -3,19 +3,23 @@
 namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+use App\Services\CommandeService;
 use App\Repository\CommandeRepository;
 use ApiPlatform\Core\Annotation\ApiFilter;
 use Doctrine\Common\Collections\Collection;
 use ApiPlatform\Core\Annotation\ApiResource;
 use Doctrine\Common\Collections\ArrayCollection;
 use Symfony\Component\Serializer\Annotation\Groups;
-use Symfony\Component\Serializer\Annotation\SerializedName;
 use Symfony\Component\Validator\Constraints as Assert;
+use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\DateFilter;
+use Symfony\Component\Serializer\Annotation\SerializedName;
+use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\ExistsFilter;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\SearchFilter;
-use App\Services\CommandeService;
 
 #[ORM\Entity(repositoryClass: CommandeRepository::class)]
-#[ApiFilter(SearchFilter::class, properties: ['zone.nom' => 'ipartial' ])]
+#[ApiFilter(SearchFilter::class, properties: ['zone.nom' => 'ipartial', "etat" => 'exact', 'zone.id' => 'exact' ])]
+#[ApiFilter(ExistsFilter::class, properties: ['zone'])]
+#[ApiFilter(DateFilter::class, properties: ['date'])]
 #[ApiResource(
     collectionOperations:[
         "post" => [
@@ -23,7 +27,7 @@ use App\Services\CommandeService;
             "status" => 201,
             "normalization_context" => [
                 "groups" => [
-                    "commande:list"
+                    "commande:read"
                 ]
             ]
         ],
@@ -77,6 +81,7 @@ class Commande
 
     #[ORM\ManyToOne(targetEntity: Client::class, inversedBy: 'commandes')]
     #[Groups(["commande:list"])]
+    #[Assert\NotNull(message: "Renseignez le client !")]
     private $client;
 
     #[ORM\ManyToOne(targetEntity: Livraison::class, inversedBy: 'commandes')]
@@ -85,7 +90,7 @@ class Commande
     #[ORM\ManyToOne(targetEntity: Gestionnaire::class, inversedBy: 'commandes')]
     private $gestionnaire;
 
-    #[Groups(["commande:list", "commande:client:detail"])]
+    #[Groups(["commande:client:detail", "commande:list"])]
     #[ORM\ManyToOne(targetEntity: Zone::class, inversedBy: 'commandes')]
     private $zone;
 
@@ -96,11 +101,10 @@ class Commande
     #[ORM\Column(type: 'string', length: 30)]
     private $etat = "en attente";
     
-    #[Groups(["commande:list"])]
     #[ORM\Column(type: 'boolean', nullable: true)]
     private $paye;
 
-    #[Groups(["commande:list", "commande:client:read", "commande:client:detail"])]
+    #[Groups(["commande:client:read", "commande:client:detail", "commande:list"])]
     #[ORM\Column(type: 'float', nullable: true)]
     private $prix;
 
@@ -110,26 +114,27 @@ class Commande
     #[Assert\Valid()]
     private $commandeTailleBoissons;
 
-    #[Groups(["commande:client:read"])]
+    #[Groups(["commande:client:read", "commande:list"])]
     #[ORM\Column(type: 'datetime', nullable: true)]
     private $date;
 
+    #[Groups(["commande:list"])]
     #[ORM\Column(type: 'string', length: 255, nullable: true)]
     private $numero;
 
     #[Assert\Valid()]
     #[ORM\OneToMany(mappedBy: 'commande', targetEntity: CommandeMenu::class, cascade: ["persist"])]
-    #[Groups(["commande:list", "commande:client:detail"])]
+    #[Groups(["commande:client:detail"])]
     private $commandeMenus;
 
     #[Assert\Valid()]
     #[ORM\OneToMany(mappedBy: 'commande', targetEntity: CommandeFrite::class, cascade: ["persist"])]
-    #[Groups(["commande:list", "commande:client:detail"])]
+    #[Groups(["commande:client:detail"])]
     private $commandeFrites;
 
     #[Assert\Valid()]
     #[ORM\OneToMany(mappedBy: 'commande', targetEntity: CommandeBurger::class, cascade: ["persist"])]
-    #[Groups(["commande:list", "commande:client:detail"])]
+    #[Groups(["commande:client:detail"])]
     private $commandeBurgers;
 
   

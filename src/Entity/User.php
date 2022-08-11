@@ -59,12 +59,12 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[Groups(["sign_up:write"])]
     protected $confirmPassword;
 
-    #[Groups(["sign_up:write", "sign_up:read", "livreur:detail"])]
+    #[Groups(["sign_up:write", "sign_up:read", "livreur:detail", "commande:list"])]
     #[Assert\Length(min:2, minMessage: "Nom invalide !")]
     #[ORM\Column(type: 'string', length: 40)]
     protected $nom;
 
-    #[Groups(["sign_up:write", "sign_up:read", "livreur:detail"])]
+    #[Groups(["sign_up:write", "sign_up:read", "livreur:detail", "commande:list"])]
     #[Assert\Length(min:2, minMessage: "Prénom invalide !")]
     #[Assert\Regex(pattern:"/^[a-zA-ZàáâäãåąčćęèéêëėįìíîïłńòóôöõøùúûüųūÿýżźñçčšžÀÁÂÄÃÅĄĆČĖĘÈÉÊËÌÍÎÏĮŁŃÒÓÔÖÕØÙÚÛÜŲŪŸÝŻŹÑßÇŒÆČŠŽ∂ð ,.'-]+$/u", message: "Nom invalide !")]
     #[ORM\Column(type: 'string', length: 40)]

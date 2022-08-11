@@ -18,11 +18,11 @@ use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInt
 class CommandeDataPersister implements DataPersisterInterface
 {
   
-    public function __construct(private EntityManagerInterface $entityManager, private TokenStorageInterface $token, private TailleBoissonRepository $tailleBoissonRepository, private CommandeService $commandeService){}
+    public function __construct(private EntityManagerInterface $entityManager, private EntityManagerInterface $entityManager2, private TokenStorageInterface $token, private TailleBoissonRepository $tailleBoissonRepository, private CommandeService $commandeService){}
 
     public function persist($data)
     {
-        $this->commandeService->quantiteChoisieVsQuantiteMenu($data);
+        ($this->commandeService->quantiteChoisieVsQuantiteMenu($data));
         // $user = $this->token->getToken()->getUser();
 
         // if($user instanceof Client)
@@ -87,9 +87,10 @@ class CommandeDataPersister implements DataPersisterInterface
        
         //----------------------------------------------------------------------------
 
-        // dd($data);
         $this->entityManager->persist($data);       
-        $this->entityManager->flush();     
+        $this->entityManager->flush();   
+        $data->setNumero("#".$data->getId()); 
+        $this->entityManager2->flush();    
     }
 
     public function supports($data): bool

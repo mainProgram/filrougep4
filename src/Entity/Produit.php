@@ -90,12 +90,12 @@ class Produit
     protected $user;
 
     #[ORM\Column(type: 'blob', nullable: true)]
-    #[Groups(["produit:read",  "produit:write", "complement:read", "boisson:write", "commande:client:detail"])]
+    #[Groups(["produit:read",  "produit:write", "complement:read", "boisson:write", "commande:client:detail", "produit:detail"])]
     protected $image;
 
     private $imageWrapper;
 
-    #[Groups(["produit:read", "complement:read"])]
+    #[Groups(["produit:read", "complement:read", "produit:detail"])]
     #[ORM\Column(type: 'string', length: 50, nullable: true)]
     private $categorie;
  

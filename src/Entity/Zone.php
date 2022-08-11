@@ -6,6 +6,7 @@ use Doctrine\ORM\Mapping as ORM;
 use App\Repository\ZoneRepository;
 use Doctrine\Common\Collections\Collection;
 use ApiPlatform\Core\Annotation\ApiResource;
+use App\Controller\ZoneController;
 use Symfony\Component\Security\Core\Role\Role;
 use Doctrine\Common\Collections\ArrayCollection;
 use Symfony\Component\Serializer\Annotation\Groups;
@@ -14,11 +15,17 @@ use Symfony\Component\Security\Core\Role\RoleHierarchy;
 
 #[ORM\Entity(repositoryClass: ZoneRepository::class)]
 #[ApiResource(
-   security: 'is_granted("ROLE_GESTIONNAIRE")',
-   securityMessage: "Vous n'êtes pas autorisé !",
+//    security: 'is_granted("ROLE_GESTIONNAIRE")',
+//    securityMessage: "Vous n'êtes pas autorisé !",
    collectionOperations: [
     "get" => [
         "normalization_context" => [ "groups" => [ "zone:read"]]
+    ],
+    "getZonesAvecCommandes" => [
+        "method" => "get",
+        "status" => 200,
+        "controller" => ZoneController::class,
+        "path" => "/zonesCommandesterminees"
     ],
     "post" => [
         "denormalization_context" => [ "groups" => ["zone:write"]],

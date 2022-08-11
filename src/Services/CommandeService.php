@@ -15,19 +15,20 @@ class CommandeService
     }
 
     // public static function quantiteChoisieVsQuantiteMenu($object, ExecutionContextInterface $context, $payload)
-    public  function quantiteChoisieVsQuantiteMenu($object)
+    public function quantiteChoisieVsQuantiteMenu($object)
     {
         foreach($object->getCommandeMenus() as $commandeMenu)
-            if(count($commandeMenu->getMenu()->getMenuTailles()) > 0)
+            if(count($commandeMenu->getMenu()->getMenuTailles()) > 0) // si le menu a des tailles
             {
                 $quantiteBoissons = 0 ;  
+                $boissonsChoisies = 0 ;  
                 foreach($commandeMenu->getMenu()->getMenuTailles() as $menuTaille)
                     $quantiteBoissons += $menuTaille->getQuantite();
 
-                $boissonsChoisies = $commandeMenu->getCommandeMenuTailleBoissons();
-                // dump($quantiteBoissons);
-
-                if(count($boissonsChoisies) != $quantiteBoissons)
+                foreach($commandeMenu->getCommandeMenuTailleBoissons() as $commandeMenuTailleBoissons)
+                    $boissonsChoisies = $commandeMenuTailleBoissons->getQuantite();
+               
+                if(($boissonsChoisies) != $quantiteBoissons)
                     return new JsonResponse( ["error" => "Le menu ".$commandeMenu->getMenu()->getNom()." a ".$quantiteBoissons." boisson (s)!"], 400);
         
             }
