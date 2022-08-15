@@ -6,30 +6,49 @@ use Doctrine\ORM\Mapping as ORM;
 use App\Repository\LivraisonRepository;
 use Doctrine\Common\Collections\Collection;
 use ApiPlatform\Core\Annotation\ApiResource;
-use Symfony\Component\Validator\Constraints as Assert;
 use Doctrine\Common\Collections\ArrayCollection;
+use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: LivraisonRepository::class)]
 #[ApiResource(
-    itemOperations:["get", "put"],
-    collectionOperations:["get", "post"]
+    itemOperations:[
+        "get" => [
+            "normalization_context" => [
+                "groups" => ["livraison:detail"]
+            ]
+        ], 
+        "put"
+    ],
+    collectionOperations:[
+        "get" => [
+            "normalization_context" => [
+                "groups" => ["livraison:read"]
+            ]
+        ], 
+        "post"
+    ]
 )]
 class Livraison
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: 'integer')]
+    #[Groups(["livraison:read", "livraison:detail", "livreur:detail"])]
     private $id;
 
     #[ORM\Column(type: 'time', nullable: true)]
     private $duree;
 
-    #[ORM\Column(type: 'date', nullable: true)]
+    #[Groups(["livraison:read","livraison:detail", "livreur:detail"])]
+    #[ORM\Column(type: 'datetime', nullable: true)]
     private $date;
 
+    #[Groups(["livraison:read","livraison:detail"])]
     #[ORM\ManyToOne(targetEntity: Livreur::class, inversedBy: 'livraisons')]
     private $livreur;
 
+    #[Groups(["livraison:detail"])]
     #[ORM\OneToMany(mappedBy: 'livraison', targetEntity: Commande::class, cascade:["persist"])]
     #[Assert\Count(min:1, minMessage:"Renseigner les commandes !")]
     private $commandes;
@@ -37,6 +56,7 @@ class Livraison
     public function __construct()
     {
         $this->commandes = new ArrayCollection();
+        $this->date = new \DateTime();
     }
 
     public function getId(): ?int

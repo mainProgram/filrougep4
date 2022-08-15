@@ -19,7 +19,7 @@ use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\SearchFilter;
     // securityMessage : "Vous n'êtes pas autorisé !",
     collectionOperations:[
         "get" => [
-            "normalization_context" => ["groups" => ["sign_up:read"]]
+            "normalization_context" => ["groups" => ["livreur:read"]]
         ],
         "post" => [
             "denormalization_context" => [ "groups" => ["sign_up:write"]],
@@ -29,12 +29,15 @@ use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\SearchFilter;
         itemOperations:[
             "get" => [
                 "normalization_context" => [ "groups" => ["livreur:detail"]],
-            ]
+            ], 
+            "put"  => [
+                "normalization_context" => [ "groups" => ["livreur:detail"]],
+            ], 
         ]
 )]
 class Livreur extends User
 {
-    #[Groups(["sign_up:write", "sign_up:read", "livreur:detail"])]
+    #[Groups(["sign_up:write", "sign_up:read", "livreur:detail", "livreur:read"])]
     #[ORM\Column(type: 'string', length: 50, unique: true)]
     private $matriculeMoto;
 
@@ -43,6 +46,7 @@ class Livreur extends User
     #[ORM\OneToMany(mappedBy: 'livreur', targetEntity: Livraison::class)]
     private $livraisons;
 
+    #[Groups(["livreur:read", "livreur:detail"])]
     #[ORM\Column(type: 'boolean', nullable: true)]
     private $isDisponible;
 

@@ -19,8 +19,9 @@ use Symfony\Component\Serializer\Annotation\Groups;
             "path" => "/sign_up",
             "denormalization_context" => [ "groups" => ["sign_up:write"]],
             "normalization_context" => ["groups" => ["sign_up:read"]]
-        ]
         ],
+        "get"
+    ],
     itemOperations:[
         "get" 
     ]

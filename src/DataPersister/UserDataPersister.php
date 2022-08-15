@@ -39,13 +39,16 @@ class UserDataPersister implements DataPersisterInterface
     */
     public function persist($data)
     {
-        $hashedPassword = $this->passwordHasher->hashPassword($data, $data->getPassword());
-        $data->setPassword($hashedPassword);
-        // $role = $data->getDiscr() == "Gestionnaire" ? ["ROLE_GESTIONNAIRE"] : ["ROLE_CLIENT"];
-        // $data->setRoles($role);
+        if(!$data->getId())
+        {
+            $hashedPassword = $this->passwordHasher->hashPassword($data, $data->getPassword());
+            $data->setPassword($hashedPassword);
+            // $role = $data->getDiscr() == "Gestionnaire" ? ["ROLE_GESTIONNAIRE"] : ["ROLE_CLIENT"];
+            // $data->setRoles($role);
+            $this->mailer->sendEmail($data);
+        }
         $this->entityManager->persist($data);
         $this->entityManager->flush();
-        $this->mailer->sendEmail($data);
     }
 
     public function remove($data)

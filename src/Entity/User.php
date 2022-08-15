@@ -37,7 +37,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: 'integer')]
-    #[Groups(["burger:detail", "sign_up:read"])]
+    #[Groups(["burger:detail", "sign_up:read", "livreur:read", "livreur:detail"])]
     protected $id;
 
     #[ORM\Column(type: 'string', length: 180, unique: true)]
@@ -49,34 +49,33 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     protected $roles = [];
 
     #[Groups(["sign_up:write"])]
-    #[Assert\Length(min: 8, minMessage: "Votre mot de passe doit avoir minimum 8 caractères !")]
-    #[Assert\Regex(pattern:"/^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{6,}$/", message: "Password should contain at least a letter and number and its length > 6 characters !")]
+    // #[Assert\Length(min: 8, minMessage: "Votre mot de passe doit avoir minimum 8 caractères !")]
+    // #[Assert\Regex(pattern:"/^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{6,}$/", message: "Password should contain at least a letter and number and its length > 6 characters !")]
     #[ORM\Column(type: 'string')]
     protected $password;
 
-    #[Assert\NotBlank(message: "Ce champ est requis !")]
-    #[Assert\EqualTo(propertyPath:"password", message: "Les deux mots de passes se sont pas identiques !")]
+    // #[Assert\NotBlank(message: "Ce champ est requis !")]
+    // #[Assert\EqualTo(propertyPath:"password", message: "Les deux mots de passes se sont pas identiques !")]
     #[Groups(["sign_up:write"])]
     protected $confirmPassword;
 
-    #[Groups(["sign_up:write", "sign_up:read", "livreur:detail", "commande:list"])]
-    #[Assert\Length(min:2, minMessage: "Nom invalide !")]
+    #[Groups(["sign_up:write", "sign_up:read", "livreur:detail", "commande:list", "livraison:read", "livraison:detail", "livreur:read"])]
+    // #[Assert\Length(min:2, minMessage: "Nom invalide !")]
     #[ORM\Column(type: 'string', length: 40)]
     protected $nom;
 
-    #[Groups(["sign_up:write", "sign_up:read", "livreur:detail", "commande:list"])]
-    #[Assert\Length(min:2, minMessage: "Prénom invalide !")]
-    #[Assert\Regex(pattern:"/^[a-zA-ZàáâäãåąčćęèéêëėįìíîïłńòóôöõøùúûüųūÿýżźñçčšžÀÁÂÄÃÅĄĆČĖĘÈÉÊËÌÍÎÏĮŁŃÒÓÔÖÕØÙÚÛÜŲŪŸÝŻŹÑßÇŒÆČŠŽ∂ð ,.'-]+$/u", message: "Nom invalide !")]
+    #[Groups(["sign_up:write", "sign_up:read", "livreur:detail", "commande:list", "livraison:read", "livraison:detail", "livreur:read"])]
+    // #[Assert\Length(min:2, minMessage: "Prénom invalide !")]
+    // #[Assert\Regex(pattern:"/^[a-zA-ZàáâäãåąčćęèéêëėįìíîïłńòóôöõøùúûüųūÿýżźñçčšžÀÁÂÄÃÅĄĆČĖĘÈÉÊËÌÍÎÏĮŁŃÒÓÔÖÕØÙÚÛÜŲŪŸÝŻŹÑßÇŒÆČŠŽ∂ð ,.'-]+$/u", message: "Nom invalide !")]
     #[ORM\Column(type: 'string', length: 40)]
     protected $prenom;
 
-    #[Groups(["sign_up:write", "sign_up:read", "livreur:detail"])]
-    #[Assert\Length(min:9, minMessage: "Longueur invalide !")]
-    #[Assert\Regex(pattern:"/^(77|78|75|76|70|33)[0-9]{7}$/", message: "Numéro non valide !")]
+    #[Groups(["sign_up:write", "sign_up:read", "livreur:detail", "livreur:read"])]
+    // #[Assert\Length(min:9, minMessage: "Longueur invalide !")]
+    // #[Assert\Regex(pattern:"/^(77|78|75|76|70|33)[0-9]{7}$/", message: "Numéro non valide !")]
     #[ORM\Column(type: 'string', length: 30)]
     protected $telephone;
 
-    #[Groups(["livreur:detail"])]
     #[ORM\Column(type: 'boolean')]
     protected $isEtat = true;
 
@@ -87,7 +86,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(type: 'string', length: 255, nullable: true)]
     protected $token;
 
-    #[Groups(["livreur:detail"])]
     #[ORM\Column(type: 'boolean', nullable: true)] //Compte bloqué par défaut
     protected $isActivated = false;
 

@@ -32,6 +32,8 @@ use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\SearchFilter;
             ]
         ],
         "get" => [
+            // "pagination_client_items_per_page" => 2,
+            "pagination_items_per_page" => 10,
             "method" => "get",
             "status" => 200,
             "normalization_context" => [
@@ -75,12 +77,12 @@ class Commande
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
-    #[Groups(["commande:client:read", "commande:list"])]
+    #[Groups(["commande:client:read", "commande:list", "livraison:detail", "commande:client:detail"])]
     #[ORM\Column(type: 'integer')]
     private $id;
 
     #[ORM\ManyToOne(targetEntity: Client::class, inversedBy: 'commandes')]
-    #[Groups(["commande:list"])]
+    #[Groups(["commande:list", "livraison:detail"])]
     #[Assert\NotNull(message: "Renseignez le client !")]
     private $client;
 
@@ -90,7 +92,7 @@ class Commande
     #[ORM\ManyToOne(targetEntity: Gestionnaire::class, inversedBy: 'commandes')]
     private $gestionnaire;
 
-    #[Groups(["commande:client:detail", "commande:list"])]
+    #[Groups(["commande:client:detail", "commande:list",  "livraison:detail"])]
     #[ORM\ManyToOne(targetEntity: Zone::class, inversedBy: 'commandes')]
     private $zone;
 
@@ -104,7 +106,7 @@ class Commande
     #[ORM\Column(type: 'boolean', nullable: true)]
     private $paye;
 
-    #[Groups(["commande:client:read", "commande:client:detail", "commande:list"])]
+    #[Groups(["commande:client:read", "commande:client:detail", "commande:list", "livraison:detail"])]
     #[ORM\Column(type: 'float', nullable: true)]
     private $prix;
 
@@ -118,7 +120,7 @@ class Commande
     #[ORM\Column(type: 'datetime', nullable: true)]
     private $date;
 
-    #[Groups(["commande:list"])]
+    #[Groups(["commande:list", "livraison:detail"])]
     #[ORM\Column(type: 'string', length: 255, nullable: true)]
     private $numero;
 
