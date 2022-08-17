@@ -53,6 +53,10 @@ class Livraison
     #[Assert\Count(min:1, minMessage:"Renseigner les commandes !")]
     private $commandes;
 
+    #[Groups(["livraison:read","livraison:detail", "livreur:detail"])]
+    #[ORM\Column(type: 'string', length: 20, nullable: true)]
+    private $etat = "en cours";
+
     public function __construct()
     {
         $this->commandes = new ArrayCollection();
@@ -126,6 +130,18 @@ class Livraison
                 $commande->setLivraison(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getEtat(): ?string
+    {
+        return $this->etat;
+    }
+
+    public function setEtat(?string $etat): self
+    {
+        $this->etat = $etat;
 
         return $this;
     }

@@ -99,7 +99,7 @@ class Commande
     #[ORM\OneToOne(targetEntity: Ticket::class, cascade: ['persist', 'remove'])]
     private $ticket;
     
-    #[Groups(["commande:list", "commande:client:read", "commande:client:detail"])]
+    #[Groups(["commande:list", "commande:client:read", "commande:client:detail", "livraison:detail"])]
     #[ORM\Column(type: 'string', length: 30)]
     private $etat = "en attente";
     

@@ -45,7 +45,7 @@ class Zone
 
     #[Assert\Length(min:1, minMessage: "Nom invalide !")]
     #[ORM\Column(type: 'string', length: 20, unique: true)]
-    #[Groups(["zone:read", "zone:write",  "livraison:detail"])]
+    #[Groups(["zone:read", "zone:write",  "livraison:detail", "commande:client:detail"])]
     private $nom;
 
     #[Assert\NotBlank(message: "Ce champ est requis !")]

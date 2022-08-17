@@ -24,6 +24,11 @@ use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
             "deserialize"=> false,
             "path" => "/users/validate/{token}",
             "controller" => MailController::class
+        ], 
+        "get" => [
+            "normalization_context" => [
+                "groups" => ["user:read"]
+            ]
         ]
     ],
     itemOperations: [
@@ -37,12 +42,12 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: 'integer')]
-    #[Groups(["burger:detail", "sign_up:read", "livreur:read", "livreur:detail"])]
+    #[Groups(["burger:detail", "sign_up:read", "livreur:read", "livreur:detail", "livraison:detail", "user:read"])]
     protected $id;
 
     #[ORM\Column(type: 'string', length: 180, unique: true)]
     #[Assert\Email(message: "Ce addresse mail est invalide !")]
-    #[Groups(["burger:detail", "sign_up:write", "sign_up:read", "livreur:detail"])]
+    #[Groups(["burger:detail", "sign_up:write", "sign_up:read", "livreur:detail", "user:read"])]
     protected $email;
 
     #[ORM\Column(type: 'json')]
@@ -91,6 +96,10 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     #[ORM\Column(type: 'datetime', nullable: true)]
     protected $expiredAt;
+
+    #[Groups(["sign_up:write", "sign_up:read"])]
+    #[ORM\Column(type: 'string', length: 255, nullable: true)]
+    private $adresse;
 
     public function __construct()
     {
@@ -316,6 +325,18 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function setConfirmPassword($confirmPassword)
     {
         $this->confirmPassword = $confirmPassword;
+
+        return $this;
+    }
+
+    public function getAdresse(): ?string
+    {
+        return $this->adresse;
+    }
+
+    public function setAdresse(?string $adresse): self
+    {
+        $this->adresse = $adresse;
 
         return $this;
     }
