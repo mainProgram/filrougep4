@@ -4,13 +4,16 @@ namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 use App\Repository\BoissonRepository;
+use ApiPlatform\Core\Annotation\ApiFilter;
 use Doctrine\Common\Collections\Collection;
 use ApiPlatform\Core\Annotation\ApiResource;
-use Symfony\Component\Validator\Constraints as Assert;
 use Doctrine\Common\Collections\ArrayCollection;
 use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Validator\Constraints as Assert;
+use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\SearchFilter;
 
 #[ORM\Entity(repositoryClass: BoissonRepository::class)]
+#[ApiFilter(SearchFilter::class, properties: ['nom' => 'ipartial', "isEtat" => "exact" ])]
 #[ApiResource(
     collectionOperations:[
         "get" => [
@@ -19,7 +22,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
             "security" => "is_granted('ROLE_GESTIONNAIRE')",
             "security_message" => "Vous n'êtes pas autorisé !",
             "normalization_context" => [
-                "groups" => ["produit:list"]
+                "groups" => ["boisson:read"]
             ]
         ],
         "post" => [

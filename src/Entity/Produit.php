@@ -23,7 +23,7 @@ use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\NumericFilter;
 #[ApiFilter(NumericFilter::class, properties: ['prix'])]
 #[ApiResource(
     collectionOperations: [
-        // "get",
+        "get",
         "/archives" => [
             "status" => 200,
             "path" => "/archives",
@@ -55,7 +55,7 @@ use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\NumericFilter;
     ],
     itemOperations:[
         "get" => [
-            "openapi_context" => ["summary"=>"hidden"]
+            "normalization_context" => ["groups" => ["produit:detail",]]
         ],
         "put"
     ] 
@@ -65,15 +65,15 @@ class Produit
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: 'integer')]
-    #[Groups(["produit:detail", "burger:read", "menu:write"])]
+    #[Groups(["produit:detail", "burger:read", "menu:write", "burger:read", "boisson:read", "produit:read"])]
     protected $id;
 
-    #[Groups(["produit:detail", "produit:read","produit:write", "menu:detail","complement:read", "boisson:write", "commande:list", "boisson:write", "commande:client:detail"])]
+    #[Groups(["produit:detail","burger:read", "produit:read","produit:write", "menu:detail","complement:read", "boisson:write", "commande:list", "boisson:write", "commande:client:detail", "boisson:read"])]
     #[ORM\Column(type: 'string', length: 50, unique: true)]
     #[Assert\NotBlank(message: "Ce champ est requis !")]
     protected $nom;
 
-    #[Groups(["produit:detail", "produit:read", "commande:client:detail"])]
+    #[Groups(["produit:detail", "produit:read", "commande:client:detail", "burger:read"])]
     #[ORM\Column(type: 'float', nullable: true)]
     protected $prix;
 
@@ -93,9 +93,10 @@ class Produit
     #[Groups(["produit:read",  "produit:write", "complement:read", "boisson:write", "commande:client:detail", "produit:detail"])]
     protected $image;
 
+    #[Groups(["produit:write"])]
     private $imageWrapper;
 
-    #[Groups(["produit:read", "complement:read", "produit:detail"])]
+    #[Groups(["produit:read", "complement:read", "produit:detail", "produit:write"])]
     #[ORM\Column(type: 'string', length: 50, nullable: true)]
     private $categorie;
  
@@ -175,7 +176,7 @@ class Produit
         // @fclose($this->image);
         // return base64_encode($photo);
         // dd(utf8_encode(base64_encode($this->image)));
-        return is_resource($this->image) ? (base64_encode(stream_get_contents($this->image))) : $this->image;
+        return is_resource($this->image) ? utf8_encode(base64_encode(stream_get_contents($this->image))) : $this->image;
 
         // return ($this->image);
         // return utf8_encode(base64_encode($this->image));

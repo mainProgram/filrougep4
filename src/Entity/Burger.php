@@ -28,8 +28,9 @@ use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\NumericFilter;
         ],
         "post" => [ 
             "denormalization_context" => [ "groups" => ["produit:write"]],
-            "security_post_denormalize" => "is_granted('BURGER_CREATE', object)",
-            "security_post_denormalize_message" => "Access dentzbgnukjm" 
+            "normalization_context" => [ "groups" => ["burger:read"]],
+            // "security_post_denormalize" => "is_granted('BURGER_CREATE', object)",
+            // "security_post_denormalize_message" => "Access dentzbgnukjm" 
         ],
         // "post" => [
         //     "status" => 201,
@@ -67,6 +68,7 @@ use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\NumericFilter;
             "method" => "put",
             "security" => "is_granted('ROLE_GESTIONNAIRE')",
             "security_message" => "Vous n'êtes pas autorisé !",
+            "normalization_context" => [ "groups" => ["burger:read"]],
         ]
     ]
 )]

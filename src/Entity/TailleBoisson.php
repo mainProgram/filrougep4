@@ -5,29 +5,20 @@ namespace App\Entity;
 use App\Entity\Taille;
 use App\Entity\Boisson;
 use Doctrine\ORM\Mapping as ORM;
+use ApiPlatform\Core\Annotation\ApiFilter;
 use Doctrine\Common\Collections\Collection;
 use ApiPlatform\Core\Annotation\ApiResource;
-use Symfony\Component\Validator\Constraints as Assert;
 use Doctrine\Common\Collections\ArrayCollection;
 use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Validator\Constraints as Assert;
+use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\SearchFilter;
 
 #[ORM\Entity]
 /**
  * @ORM\Table(name="taille_boisson")
  */
+#[ApiFilter(SearchFilter::class, properties: ['nom' => 'ipartial', "isEtat" => "exact" ])]
 #[ApiResource(
-    // collectionOperations:[
-    //     "get" => [
-    //         "method" => "get",
-    //         "status" => 200,
-    //         "normalization_context" => [
-    //             "groups" => ["complement:read"]
-    //         ]
-    //     ], "post"
-    // ],
-    // itemOperations:[
-    //     "get"
-    // ] 
     collectionOperations:[
         "get" => [
             // "openapi_context" => ["summary"=>"hidden"]
@@ -90,6 +81,9 @@ class TailleBoisson
     #[Groups(["complement:read", "commande:client:detail"])]
     #[ORM\Column(type: 'string', length: 50, nullable: true)]
     private $nom;
+
+    #[ORM\Column(type: 'boolean', nullable: true)]
+    private $isEtat;
 
     public function __construct()
     {
@@ -262,6 +256,18 @@ class TailleBoisson
     public function setNom(?string $nom): self
     {
         $this->nom = $nom;
+
+        return $this;
+    }
+
+    public function isIsEtat(): ?bool
+    {
+        return $this->isEtat;
+    }
+
+    public function setIsEtat(?bool $isEtat): self
+    {
+        $this->isEtat = $isEtat;
 
         return $this;
     }

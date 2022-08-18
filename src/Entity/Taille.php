@@ -4,14 +4,17 @@ namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 use App\Repository\TailleRepository;
+use ApiPlatform\Core\Annotation\ApiFilter;
 use Doctrine\Common\Collections\Collection;
 use ApiPlatform\Core\Annotation\ApiResource;
 use Doctrine\Common\Collections\ArrayCollection;
-use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Validator\Constraints as Assert;
+use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\SearchFilter;
 
 
 #[ORM\Entity(repositoryClass: TailleRepository::class)]
+#[ApiFilter(SearchFilter::class, properties: ['nom' => 'ipartial', "isEtat" => "exact" ])]
 #[ApiResource(
     collectionOperations:[
         "post" => ["denormalization_context" => [ "groups" => ["taille:write"]]],
@@ -26,7 +29,7 @@ class Taille
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: 'integer')]
-    #[Groups(["menu:write"])]
+    #[Groups(["menu:write", "taille:read"])]
     private $id;
 
     #[Assert\NotBlank(message: "Ce champ est requis !")]
@@ -45,6 +48,9 @@ class Taille
 
     #[ORM\OneToMany(mappedBy: 'taille', targetEntity: TailleBoisson::class)]
     private $tailleBoissons;
+
+    #[ORM\Column(type: 'boolean', nullable: true)]
+    private $isEtat;
 
     public function __construct()
     {
@@ -137,6 +143,18 @@ class Taille
                 $tailleBoisson->setTaille(null);
             }
         }
+
+        return $this;
+    }
+
+    public function isIsEtat(): ?bool
+    {
+        return $this->isEtat;
+    }
+
+    public function setIsEtat(?bool $isEtat): self
+    {
+        $this->isEtat = $isEtat;
 
         return $this;
     }
