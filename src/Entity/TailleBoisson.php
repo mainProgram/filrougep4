@@ -45,7 +45,7 @@ class TailleBoisson
     #[ORM\Column(type: 'integer')]
     private $id;
 
-    #[Groups(["complement:read", "commande:client:detail"])]
+    #[Groups(["complement:read", "commande:client:detail", "taille_boisson:write"])]
     #[ORM\Column(type: 'float')]
     private $prix;
 
@@ -83,7 +83,7 @@ class TailleBoisson
     private $nom;
 
     #[ORM\Column(type: 'boolean', nullable: true)]
-    private $isEtat;
+    private $isEtat = true;
 
     public function __construct()
     {

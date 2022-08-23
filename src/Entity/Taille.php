@@ -29,7 +29,7 @@ class Taille
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: 'integer')]
-    #[Groups(["menu:write", "taille:read"])]
+    #[Groups(["taille:read"])]
     private $id;
 
     #[Assert\NotBlank(message: "Ce champ est requis !")]

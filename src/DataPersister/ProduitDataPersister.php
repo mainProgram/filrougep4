@@ -34,16 +34,28 @@ class ProduitDataPersister implements DataPersisterInterface
 
         if($data instanceof Boisson)
         {
-            $nom = $data->getNom() . " " . $data->getTailleBoissons()[0]->getTaille()->getNom();
-            $data->getTailleBoissons()[0]->setNom($nom);
-
-            $prix = $data->getTailleBoissons()[0]->getTaille()->getPrix();
-            $data->getTailleBoissons()[0]->setPrix($prix);
             $data->setPrix((0));
         }
         elseif ($data instanceof Menu)
         {
             $this->service->calculPrix($data);
+        }
+        else if($data instanceof TailleBoisson)
+        {
+
+            if(!$data->getNom())
+            {
+                $nom = $data->getBoisson()->getNom() . " " . $data->getTaille()->getNom();
+                $data->setNom($nom);
+            }
+
+            // $prix = $data->getTailleBoissons()[0]->getTaille()->getPrix();
+            // $data->getTailleBoissons()[0]->setPrix($prix);
+        //     $nom = $data->getNom() . " " . $data->getTailleBoissons()[0]->getTaille()->getNom();
+        //     $data->getTailleBoissons()[0]->setNom($nom);
+
+        //     $prix = $data->getTailleBoissons()[0]->getTaille()->getPrix();
+        //     $data->getTailleBoissons()[0]->setPrix($prix);
         }
 
         $file = $data->getImageWrapper();

@@ -23,12 +23,12 @@ class CommandeDataPersister implements DataPersisterInterface
     public function persist($data)
     {
         ($this->commandeService->quantiteChoisieVsQuantiteMenu($data));
-        // $user = $this->token->getToken()->getUser();
+        $user = $this->token->getToken()->getUser();
 
-        // if($user instanceof Client)
-        //     $data->setClient($user);
-        // elseif($user instanceof Gestionnaire)
-        //     $data->setGestionnaire($user);
+        if($user instanceof Client)
+            $data->setClient($user);
+        elseif($user instanceof Gestionnaire)
+            $data->setGestionnaire($user);
 
         // $lignesDeCommandes = $data->getCommandeProduits();
         
