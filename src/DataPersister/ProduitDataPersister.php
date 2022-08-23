@@ -48,6 +48,10 @@ class ProduitDataPersister implements DataPersisterInterface
                 $nom = $data->getBoisson()->getNom() . " " . $data->getTaille()->getNom();
                 $data->setNom($nom);
             }
+            if($data->getQuantiteStock() <= 0)
+            {
+                $data->setIsEtat(false);
+            }
 
             // $prix = $data->getTailleBoissons()[0]->getTaille()->getPrix();
             // $data->getTailleBoissons()[0]->setPrix($prix);
