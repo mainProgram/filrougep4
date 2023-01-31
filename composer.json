@@ -50,6 +50,7 @@
             "symfony/flex": true,
             "symfony/runtime": true
         },
+        "platform-check": false,
         "optimize-autoloader": true,
         "preferred-install": {
             "*": "dist"
