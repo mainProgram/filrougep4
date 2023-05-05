@@ -2,91 +2,71 @@
 
 namespace App\Entity;
 
+use ApiPlatform\Metadata\Post;
+use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Put;
+use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\ApiProperty;
+use ApiPlatform\Doctrine\Orm\Filter\SearchFilter;
+use ApiPlatform\Metadata\ApiFilter;
 use Doctrine\ORM\Mapping as ORM;
 use App\Repository\LivreurRepository;
-use ApiPlatform\Core\Annotation\ApiFilter;
 use Doctrine\Common\Collections\Collection;
-use ApiPlatform\Core\Annotation\ApiResource;
-use ApiPlatform\Core\Annotation\ApiSubresource;
 use Doctrine\Common\Collections\ArrayCollection;
 use Symfony\Component\Serializer\Annotation\Groups;
-use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\SearchFilter;
-
-#[ORM\Entity(repositoryClass: LivreurRepository::class)]
-#[ApiFilter(SearchFilter::class, properties: ['isDisponible' => 'exact'])]
 #[ApiResource(
-    // security: 'is_granted("ROLE_GESTIONNAIRE)',
-    // securityMessage : "Vous n'êtes pas autorisé !",
-    collectionOperations:[
-        "get" => [
-            "normalization_context" => ["groups" => ["livreur:read"]]
-        ],
-        "post" => [
-            "denormalization_context" => [ "groups" => ["sign_up:write"]],
-            "normalization_context" => ["groups" => ["sign_up:read"]]
-        ]
-        ],
-        itemOperations:[
-            "get" => [
-                "normalization_context" => [ "groups" => ["livreur:detail"]],
-            ], 
-            "put"  => [
-                "normalization_context" => [ "groups" => ["livreur:detail"]],
-            ], 
-        ]
+    operations: [
+        new Get(normalizationContext: ['groups' => ['livreur:detail']]), 
+        new Put(normalizationContext: ['groups' => ['livreur:detail']]), 
+        new GetCollection(normalizationContext: ['groups' => ['livreur:read']]), 
+        new Post(denormalizationContext: ['groups' => ['sign_up:write']], normalizationContext: ['groups' => ['sign_up:read']])
+    ]
 )]
+#[ORM\Entity(repositoryClass: LivreurRepository::class)]
+#[ApiFilter(filterClass: SearchFilter::class, properties: ['isDisponible' => 'exact'])]
 class Livreur extends User
 {
     #[Groups(["sign_up:write", "sign_up:read", "livreur:detail", "livreur:read"])]
     #[ORM\Column(type: 'string', length: 50, unique: true)]
     private $matriculeMoto;
-
-    #[ApiSubresource()]
+    // #[ApiSubresource]
     #[Groups(["livreur:detail"])]
     #[ORM\OneToMany(mappedBy: 'livreur', targetEntity: Livraison::class)]
     private $livraisons;
-
     #[Groups(["livreur:read", "livreur:detail"])]
     #[ORM\Column(type: 'boolean', nullable: true)]
     private $isDisponible;
-
     public function __construct()
     {
         parent::__construct();
         $this->livraisons = new ArrayCollection();
     }
-
-    public function getMatriculeMoto(): ?string
+    public function getMatriculeMoto() : ?string
     {
         return $this->matriculeMoto;
     }
-
-    public function setMatriculeMoto(string $matriculeMoto): self
+    public function setMatriculeMoto(string $matriculeMoto) : self
     {
         $this->matriculeMoto = $matriculeMoto;
-
         return $this;
     }
-
     /**
      * @return Collection<int, Livraison>
      */
-    public function getLivraisons(): Collection
+    public function getLivraisons() : Collection
     {
         return $this->livraisons;
     }
-
-    public function addLivraison(Livraison $livraison): self
+    public function addLivraison(Livraison $livraison) : self
     {
         if (!$this->livraisons->contains($livraison)) {
             $this->livraisons[] = $livraison;
             $livraison->setLivreur($this);
         }
-
         return $this;
     }
-
-    public function removeLivraison(Livraison $livraison): self
+    public function removeLivraison(Livraison $livraison) : self
     {
         if ($this->livraisons->removeElement($livraison)) {
             // set the owning side to null (unless already changed)
@@ -94,19 +74,15 @@ class Livreur extends User
                 $livraison->setLivreur(null);
             }
         }
-
         return $this;
     }
-
-    public function isIsDisponible(): ?bool
+    public function isIsDisponible() : ?bool
     {
         return $this->isDisponible;
     }
-
-    public function setIsDisponible(?bool $isDisponible): self
+    public function setIsDisponible(?bool $isDisponible) : self
     {
         $this->isDisponible = $isDisponible;
-
         return $this;
     }
 }

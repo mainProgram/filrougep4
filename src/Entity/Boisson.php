@@ -2,101 +2,53 @@
 
 namespace App\Entity;
 
+use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Doctrine\Orm\Filter\SearchFilter;
+use ApiPlatform\Metadata\ApiFilter;
+use ApiPlatform\Metadata\Delete;
+use ApiPlatform\Metadata\Post;
+use ApiPlatform\Metadata\Put;
 use Doctrine\ORM\Mapping as ORM;
 use App\Repository\BoissonRepository;
-use ApiPlatform\Core\Annotation\ApiFilter;
 use Doctrine\Common\Collections\Collection;
-use ApiPlatform\Core\Annotation\ApiResource;
 use Doctrine\Common\Collections\ArrayCollection;
-use Symfony\Component\Serializer\Annotation\Groups;
-use Symfony\Component\Validator\Constraints as Assert;
-use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\SearchFilter;
-
-#[ORM\Entity(repositoryClass: BoissonRepository::class)]
-#[ApiFilter(SearchFilter::class, properties: ['nom' => 'ipartial', "isEtat" => "exact" ])]
 #[ApiResource(
-    collectionOperations:[
-        "get" => [
-            "method" => "get",
-            "status" => 200,
-            "security" => "is_granted('ROLE_GESTIONNAIRE')",
-            "security_message" => "Vous n'êtes pas autorisé !",
-            "normalization_context" => [
-                "groups" => ["boisson:read"]
-            ]
-        ],
-        "post" => [
-            "status" => 201,
-            "method" => "post",
-            "security" => "is_granted('ROLE_GESTIONNAIRE')",
-            "security_message" => "Vous n'êtes pas autorisé !",
-            "normalization_context" => [
-                "groups" => ["produit:detail"]
-            ],
-            "denormalization_context" => [
-                "groups" => ["boisson:write"]
-            ]
-        ],
-    ],
-    itemOperations: [
-        "get" => [
-            "method" => "get",
-            "status" => 200,
-            "normalization_context" => [
-                "groups" => ["burger:detail"]
-            ]
-        ],
-        "delete" => [
-            "method" => "delete",
-            "security" => "is_granted('ROLE_GESTIONNAIRE')",
-            "security_message" => "Vous n'êtes pas autorisé !",
-        ],
-        "put" => [
-            "method" => "put",
-            "security" => "is_granted('ROLE_GESTIONNAIRE')",
-            "security_message" => "Vous n'êtes pas autorisé !",
-        ]
-    ]
-)]
-
+    operations: [
+        new Get(status: 200, normalizationContext: ['groups' => ['burger:detail']]), 
+        new Put(security: 'is_granted(\'ROLE_GESTIONNAIRE\')', securityMessage: 'Vous n\'êtes pas autorisé !'), 
+        new Delete(security: 'is_granted(\'ROLE_GESTIONNAIRE\')', securityMessage: 'Vous n\'êtes pas autorisé !'), 
+        new GetCollection(status: 200, security: 'is_granted(\'ROLE_GESTIONNAIRE\')', securityMessage: 'Vous n\'êtes pas autorisé !', normalizationContext: ['groups' => ['boisson:read']]), 
+        new Post(status: 201, security: 'is_granted(\'ROLE_GESTIONNAIRE\')', securityMessage: 'Vous n\'êtes pas autorisé !', normalizationContext: ['groups' => ['produit:detail']], denormalizationContext: ['groups' => ['boisson:write']])])]
+#[ORM\Entity(repositoryClass: BoissonRepository::class)]
+#[ApiFilter(filterClass: SearchFilter::class, properties: ['nom' => 'ipartial', 'isEtat' => 'exact'])]
 class Boisson extends Produit
 {
-
-  
-
     #[ORM\OneToMany(mappedBy: 'boisson', targetEntity: TailleBoisson::class, cascade: ["persist"])]
-    // #[Groups(["boisson:write"])]
-    // #[Assert\Valid()]
     private $tailleBoissons;
-
- 
-
     public function __construct()
     {
         parent::__construct();
         $this->tailleBoissons = new ArrayCollection();
         $this->categorie = "boisson";
     }
-
     /**
      * @return Collection<int, TailleBoisson>
      */
-    public function getTailleBoissons(): Collection
+    public function getTailleBoissons() : Collection
     {
         return $this->tailleBoissons;
     }
-
-    public function addTailleBoisson(TailleBoisson $tailleBoisson): self
+    public function addTailleBoisson(TailleBoisson $tailleBoisson) : self
     {
         if (!$this->tailleBoissons->contains($tailleBoisson)) {
             $this->tailleBoissons[] = $tailleBoisson;
             $tailleBoisson->setBoisson($this);
         }
-
         return $this;
     }
-
-    public function removeTailleBoisson(TailleBoisson $tailleBoisson): self
+    public function removeTailleBoisson(TailleBoisson $tailleBoisson) : self
     {
         if ($this->tailleBoissons->removeElement($tailleBoisson)) {
             // set the owning side to null (unless already changed)
@@ -104,9 +56,6 @@ class Boisson extends Produit
                 $tailleBoisson->setBoisson(null);
             }
         }
-
         return $this;
     }
-
- 
 }

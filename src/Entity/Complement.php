@@ -2,25 +2,11 @@
 
 namespace App\Entity;
 
-use ApiPlatform\Core\Annotation\ApiResource;
-
-#[ApiResource(
-    collectionOperations:
-    [
-        // "complements" => [
-        //     "method" => "get",
-        //     "status" => 200,
-        //     "path" => "/complements"
-        // ],
-        "get" => [
-            "normalization_context" => [
-                "groups" => ["complement:read"]
-            ]
-        ]
-    ],  
-    itemOperations: []
-)]
+use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\ApiProperty;
+use ApiPlatform\Metadata\ApiFilter;
+#[ApiResource(operations: [new GetCollection(normalizationContext: ['groups' => ['complement:read']])])]
 class Complement
 {
-
 }
