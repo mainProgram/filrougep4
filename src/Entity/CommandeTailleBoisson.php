@@ -2,11 +2,15 @@
 
 namespace App\Entity;
 
+use App\Entity\Commande;
+use App\Entity\TailleBoisson;
 use Doctrine\ORM\Mapping as ORM;
+use ApiPlatform\Metadata\ApiResource;
 use App\Repository\CommandeTailleBoissonRepository;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 
+#[ApiResource()]
 #[ORM\Entity(repositoryClass: CommandeTailleBoissonRepository::class)]
 class CommandeTailleBoisson
 {
@@ -19,17 +23,18 @@ class CommandeTailleBoisson
     private $commande;
 
     #[Assert\NotNull(message: "Renseigner une boisson!")]
-    #[Groups(["commande:client:detail"])]
+    #[Groups(["commande:client:detail", "livraison:detail", "commande:client:read"])]
     #[ORM\ManyToOne(targetEntity: TailleBoisson::class, inversedBy: 'commandeTailleBoissons')]
     private $tailleBoisson;
 
+    #[Groups(["livraison:detail", "commande:client:read"])]
     #[ORM\Column(type: 'integer', nullable: true)]
     private $prix;
 
     #[Assert\NotBlank(message: "Ce champ est requis !")]
     #[Assert\Positive(message: "La quantité doit être supérieure à 0 !")]
     #[ORM\Column(type: 'integer', nullable: true)]
-    #[Groups(["commande:client:detail"])]
+    #[Groups(["commande:client:detail", "livraison:detail", "commande:client:read"])]
     private $quantite = 1;
 
     public function getId(): ?int

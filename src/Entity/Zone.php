@@ -2,18 +2,20 @@
 
 namespace App\Entity;
 
-use ApiPlatform\Metadata\Post;
-use ApiPlatform\Metadata\GetCollection;
-use ApiPlatform\Metadata\Delete;
-use ApiPlatform\Metadata\Put;
+use App\Entity\Commande;
+use App\Entity\Quartier;
 use ApiPlatform\Metadata\Get;
-use ApiPlatform\Metadata\ApiResource;
-use ApiPlatform\Metadata\ApiProperty;
-use ApiPlatform\Metadata\ApiFilter;
+use ApiPlatform\Metadata\Put;
+use ApiPlatform\Metadata\Post;
+use ApiPlatform\Metadata\Delete;
 use Doctrine\ORM\Mapping as ORM;
-use App\Repository\ZoneRepository;
-use Doctrine\Common\Collections\Collection;
 use App\Controller\ZoneController;
+use App\Repository\ZoneRepository;
+use ApiPlatform\Metadata\ApiFilter;
+use ApiPlatform\Metadata\ApiProperty;
+use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\GetCollection;
+use Doctrine\Common\Collections\Collection;
 use Symfony\Component\Security\Core\Role\Role;
 use Doctrine\Common\Collections\ArrayCollection;
 use Symfony\Component\Serializer\Annotation\Groups;
@@ -43,7 +45,7 @@ class Zone
     private $nom;
     #[Assert\NotBlank(message: "Ce champ est requis !")]
     #[Assert\Positive(message: "Le prix doit être supérieur à 0 !")]
-    #[Groups(["zone:read", "zone:write", "commande:client:detail"])]
+    #[Groups(["zone:read", "zone:write", "commande:client:detail", "livraison:detail"])]
     #[ORM\Column(type: 'float')]
     private $prix;
     #[ORM\Column(type: 'boolean', nullable: true)]

@@ -2,14 +2,16 @@
 
 namespace App\Entity;
 
-use ApiPlatform\Metadata\GetCollection;
+use App\Entity\Produit;
 use ApiPlatform\Metadata\Get;
-use ApiPlatform\Metadata\ApiResource;
-use ApiPlatform\Metadata\ApiProperty;
-use ApiPlatform\Metadata\ApiFilter;
 use Doctrine\ORM\Mapping as ORM;
 use App\Controller\MailController;
 use App\Repository\UserRepository;
+use ApiPlatform\Metadata\ApiFilter;
+use ApiPlatform\Metadata\ApiProperty;
+use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Put;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\Common\Collections\ArrayCollection;
 use Symfony\Component\Serializer\Annotation\Groups;
@@ -18,7 +20,9 @@ use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 #[ApiResource(
     operations: [
-        new Get(openapiContext: ['summary' => 'hidden']), 
+        new Get(), 
+        new Put(), 
+        // new Get(openapiContext: ['summary' => 'hidden']), 
         new GetCollection(deserialize: false, uriTemplate: '/users/validate/{token}', controller: MailController::class), 
         new GetCollection(normalizationContext: ['groups' => ['user:read']])
     ]
@@ -53,7 +57,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[Groups(["sign_up:write", "sign_up:read", "livreur:detail", "commande:list", "livraison:read", "livraison:detail", "livreur:read"])]
     #[ORM\Column(type: 'string', length: 40)]
     protected $prenom;
-    #[Groups(["sign_up:write", "sign_up:read", "livreur:detail", "livreur:read"])]
+    #[Groups(["sign_up:write", "sign_up:read", "livreur:detail", "livreur:read", "livraison:detail"])]
     #[ORM\Column(type: 'string', length: 30)]
     protected $telephone;
     #[ORM\Column(type: 'boolean')]

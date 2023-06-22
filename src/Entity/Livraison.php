@@ -2,15 +2,17 @@
 
 namespace App\Entity;
 
+use App\Entity\Livreur;
+use App\Entity\Commande;
+use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\Put;
 use ApiPlatform\Metadata\Link;
 use ApiPlatform\Metadata\Post;
-use ApiPlatform\Metadata\GetCollection;
-use ApiPlatform\Metadata\Put;
-use ApiPlatform\Metadata\Get;
-use ApiPlatform\Metadata\ApiResource;
-use ApiPlatform\Metadata\ApiProperty;
-use ApiPlatform\Metadata\ApiFilter;
 use Doctrine\ORM\Mapping as ORM;
+use ApiPlatform\Metadata\ApiFilter;
+use ApiPlatform\Metadata\ApiProperty;
+use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\GetCollection;
 use App\Repository\LivraisonRepository;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\Common\Collections\ArrayCollection;
@@ -27,9 +29,10 @@ use Symfony\Component\Validator\Constraints as Assert;
 #[ORM\Entity(repositoryClass: LivraisonRepository::class)]
 #[ApiResource(
     uriTemplate: '/livreurs/{id}/livraisons.{_format}', 
-    uriVariables: ['id' => new Link(fromClass: \App\Entity\Livreur::class, identifiers: ['id'])], 
+    uriVariables: ['id' => new Link(fromClass: Livreur::class, fromProperty: 'livraisons')], 
     status: 200, 
-    operations: [new GetCollection()]
+    operations: [new GetCollection()],
+    normalizationContext: ['groups' => ['livraison:detail']]
 )]
 class Livraison
 {

@@ -38,7 +38,7 @@ class Produit
     #[ORM\Column(type: 'integer')]
     #[Groups(["produit:detail", "burger:read", "burger:read", "boisson:read", "produit:read"])]
     protected $id;
-    #[Groups(["produit:detail", "burger:read", "produit:read", "produit:write", "menu:detail", "complement:read", "boisson:write", "commande:list", "boisson:write", "commande:client:detail", "boisson:read"])]
+    #[Groups(["produit:detail", "burger:read", "produit:read", "produit:write", "menu:detail", "complement:read", "boisson:write", "commande:list", "boisson:write", "commande:client:detail", "boisson:read","livraison:detail"])]
     #[ORM\Column(type: 'string', length: 50, unique: true)]
     #[Assert\NotBlank(message: "Ce champ est requis !")]
     protected $nom;
@@ -64,7 +64,7 @@ class Produit
     private $categorie;
     public function __construct()
     {
-        $this->commande = new ArrayCollection();
+        // $this->commande = new ArrayCollection();
     }
     public function getId() : ?int
     {
@@ -121,7 +121,7 @@ class Produit
         // @fclose($this->image);
         // return base64_encode($photo);
         // dd(utf8_encode(base64_encode($this->image)));
-        return is_resource($this->image) ? utf8_encode(base64_encode(stream_get_contents($this->image))) : $this->image;
+        return is_resource($this->image) ? iconv('ISO-8859-1', 'UTF-8', (base64_encode(stream_get_contents($this->image)))) : $this->image;
         // return ($this->image);
         // return utf8_encode(base64_encode($this->image));
     }

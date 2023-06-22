@@ -2,19 +2,21 @@
 
 namespace App\Entity;
 
-use ApiPlatform\Metadata\GetCollection;
+use App\Entity\MenuTaille;
+use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\Put;
+use App\Entity\TailleBoisson;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Delete;
-use ApiPlatform\Metadata\Put;
-use ApiPlatform\Metadata\Get;
-use ApiPlatform\Metadata\ApiResource;
-use ApiPlatform\Metadata\ApiProperty;
-use ApiPlatform\Doctrine\Orm\Filter\SearchFilter;
-use ApiPlatform\Metadata\ApiFilter;
 use Doctrine\ORM\Mapping as ORM;
+use ApiPlatform\Metadata\ApiFilter;
 use App\Repository\TailleRepository;
+use ApiPlatform\Metadata\ApiProperty;
+use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\GetCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\Common\Collections\ArrayCollection;
+use ApiPlatform\Doctrine\Orm\Filter\SearchFilter;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 #[ApiResource(
@@ -37,7 +39,7 @@ class Taille
     private $id;
     #[Assert\NotBlank(message: "Ce champ est requis !")]
     #[ORM\Column(type: 'string', length: 20, unique: true)]
-    #[Groups(["complement:read", "menu:detail", "taille:read", "taille:write", "produit:detail"])]
+    #[Groups(["complement:read", "menu:detail", "taille:read", "taille:write", "produit:detail", "livraison:detail"])]
     private $nom;
     #[Assert\NotBlank(message: "Ce champ est requis !")]
     #[Assert\Positive(message: "Le prix doit être supérieur à 0 !")]

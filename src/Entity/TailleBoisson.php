@@ -2,19 +2,21 @@
 
 namespace App\Entity;
 
-use ApiPlatform\Metadata\Post;
-use ApiPlatform\Metadata\GetCollection;
-use ApiPlatform\Metadata\Put;
-use ApiPlatform\Metadata\Get;
-use ApiPlatform\Metadata\ApiResource;
-use ApiPlatform\Metadata\ApiProperty;
-use ApiPlatform\Doctrine\Orm\Filter\SearchFilter;
-use ApiPlatform\Metadata\ApiFilter;
 use App\Entity\Taille;
 use App\Entity\Boisson;
+use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\Put;
+use ApiPlatform\Metadata\Post;
 use Doctrine\ORM\Mapping as ORM;
+use ApiPlatform\Metadata\ApiFilter;
+use ApiPlatform\Metadata\ApiProperty;
+use ApiPlatform\Metadata\ApiResource;
+use App\Entity\CommandeTailleBoisson;
+use ApiPlatform\Metadata\GetCollection;
+use App\Entity\CommandeMenuTailleBoisson;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\Common\Collections\ArrayCollection;
+use ApiPlatform\Doctrine\Orm\Filter\SearchFilter;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 #[ApiResource(
@@ -42,12 +44,12 @@ class TailleBoisson
     #[Groups(["taille_boisson:write", "complement:read"])]
     #[ORM\Column(type: 'integer', nullable: true)]
     private $quantiteStock;
-    #[Groups(["taille_boisson:write", "complement:read"])]
+    #[Groups(["taille_boisson:write", "complement:read", "livraison:detail"])]
     #[Assert\NotNull(message: "Renseignez la taille !")]
     #[ORM\ManyToOne(targetEntity: Taille::class, inversedBy: 'tailleBoissons')]
     private $taille;
     #[Assert\NotNull(message: "Renseignez la boisson !")]
-    #[Groups(["taille_boisson:write", "complement:read"])]
+    #[Groups(["taille_boisson:write", "complement:read", "livraison:detail"])]
     #[ORM\ManyToOne(targetEntity: Boisson::class, inversedBy: 'tailleBoissons')]
     private $boisson;
     #[ORM\OneToMany(mappedBy: 'tailleBoisson', targetEntity: CommandeTailleBoisson::class)]

@@ -37,7 +37,7 @@ security:
         - { path: ^/api/login, roles: PUBLIC_ACCESS }
         - { path: ^/api/sign_up$, roles: PUBLIC_ACCESS }
         # - { path: ^/api/clients, roles: PUBLIC_ACCESS }
-        # - { path: ^/api/complements, roles: PUBLIC_ACCESS }
+        - { path: ^/api/complements, roles: PUBLIC_ACCESS }
         # - { path: ^/api/commandes, roles: PUBLIC_ACCESS }
         # - { path: ^/api/livreurs, roles: PUBLIC_ACCESS }
         # - { path: ^/api/livraisons, roles: PUBLIC_ACCESS }

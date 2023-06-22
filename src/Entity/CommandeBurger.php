@@ -2,11 +2,15 @@
 
 namespace App\Entity;
 
+use App\Entity\Burger;
+use App\Entity\Commande;
 use Doctrine\ORM\Mapping as ORM;
+use ApiPlatform\Metadata\ApiResource;
 use App\Repository\CommandeBurgerRepository;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 
+#[ApiResource()]
 #[ORM\Entity(repositoryClass: CommandeBurgerRepository::class)]
 class CommandeBurger
 {
@@ -18,17 +22,18 @@ class CommandeBurger
     #[ORM\Column(type: 'integer')] 
     #[Assert\NotBlank(message: "Ce champ est requis !")]
     #[Assert\Positive(message: "La quantité doit être supérieure à 0 !")]
-    #[Groups(["commande:client:detail"])]
+    #[Groups(["commande:client:detail", "livraison:detail", "commande:client:read"])]
     private $quantite = 1;
 
+    #[Groups(["livraison:detail", "commande:client:read"])]
     #[ORM\Column(type: 'integer', nullable: true)]
     private $prix;
-
+    
     #[ORM\ManyToOne(targetEntity: Commande::class, inversedBy: 'commandeBurgers', cascade: ["persist"])]
     private $commande;
 
     #[Assert\NotNull(message: "Renseigner un burger !")]
-    #[Groups(["commande:client:detail"])]
+    #[Groups(["commande:client:detail", "livraison:detail", "commande:client:read"])]
     #[ORM\ManyToOne(targetEntity: Burger::class, inversedBy: 'commandeBurgers')]
     private $burger;
 

@@ -2,21 +2,24 @@
 
 namespace App\Entity;
 
-use ApiPlatform\Metadata\Post;
-use ApiPlatform\Metadata\GetCollection;
+use App\Entity\Produit;
+use App\Entity\MenuBurger;
 use ApiPlatform\Metadata\Get;
-use ApiPlatform\Metadata\ApiResource;
-use ApiPlatform\Metadata\ApiProperty;
-use ApiPlatform\Doctrine\Orm\Filter\NumericFilter;
-use ApiPlatform\Doctrine\Orm\Filter\SearchFilter;
-use ApiPlatform\Metadata\ApiFilter;
-use ApiPlatform\Metadata\Delete;
 use ApiPlatform\Metadata\Put;
+use ApiPlatform\Metadata\Post;
+use App\Entity\CommandeBurger;
+use ApiPlatform\Metadata\Delete;
 use Doctrine\ORM\Mapping as ORM;
+use ApiPlatform\Metadata\ApiFilter;
 use App\Controller\BurgerController;
 use App\Repository\BurgerRepository;
+use ApiPlatform\Metadata\ApiProperty;
+use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\GetCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\Common\Collections\ArrayCollection;
+use ApiPlatform\Doctrine\Orm\Filter\SearchFilter;
+use ApiPlatform\Doctrine\Orm\Filter\NumericFilter;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 #[ApiResource(
@@ -27,7 +30,7 @@ use Symfony\Component\Validator\Constraints as Assert;
         new GetCollection(status: 200, security: 'is_granted(\'ROLE_GESTIONNAIRE\')', securityMessage: 'Vous n\'êtes pas autorisé !', normalizationContext: ['groups' => ['produit:read']]), 
         new Post(denormalizationContext: ['groups' => ['produit:write']], normalizationContext: ['groups' => ['burger:read']])])]
 #[ORM\Entity(repositoryClass: BurgerRepository::class)]
-#[ApiFilter(filterClass: NumericFilter::class, properties: ['prix'])]
+// #[ApiFilter(filterClass: NumericFilter::class, properties: ['prix'])]
 class Burger extends Produit
 {
     #[Assert\NotBlank(message: "Ce champ est requis !")]

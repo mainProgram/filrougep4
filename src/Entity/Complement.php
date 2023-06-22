@@ -4,9 +4,10 @@ namespace App\Entity;
 
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\ApiResource;
-use ApiPlatform\Metadata\ApiProperty;
-use ApiPlatform\Metadata\ApiFilter;
-#[ApiResource(operations: [new GetCollection(normalizationContext: ['groups' => ['complement:read']])])]
+use App\State\ComplementProvider;
+
+#[ApiResource(operations: [new GetCollection(status: 200, uriTemplate: '/complements', normalizationContext: ['groups' => ['complement:read']], provider:ComplementProvider::class)])]
+
 class Complement
 {
 }

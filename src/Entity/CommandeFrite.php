@@ -2,11 +2,15 @@
 
 namespace App\Entity;
 
+use App\Entity\Frite;
+use App\Entity\Commande;
 use Doctrine\ORM\Mapping as ORM;
+use ApiPlatform\Metadata\ApiResource;
 use App\Repository\CommandeFriteRepository;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 
+#[ApiResource()]
 #[ORM\Entity(repositoryClass: CommandeFriteRepository::class)]
 class CommandeFrite
 {
@@ -17,15 +21,16 @@ class CommandeFrite
 
     #[ORM\Column(type: 'integer')]
     #[Assert\NotBlank(message: "Ce champ est requis !")]
-    #[Groups(["commande:client:detail"])]
+    #[Groups(["commande:client:detail", "livraison:detail", "commande:client:read"])]
     #[Assert\Positive(message: "La quantité doit être supérieure à 0 !")]
     private $quantite = 1;
 
+    #[Groups(["livraison:detail", "commande:client:read"])]
     #[ORM\Column(type: 'integer', nullable: true)]
     private $prix;
 
     #[Assert\NotNull(message: "Renseigner des frites !")]
-    #[Groups(["commande:client:detail"])]
+    #[Groups(["commande:client:detail", "livraison:detail", "commande:client:read"])]
     #[ORM\ManyToOne(targetEntity: Frite::class, inversedBy: 'commandeFrites')]
     private $frite;
 

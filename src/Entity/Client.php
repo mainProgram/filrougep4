@@ -2,12 +2,13 @@
 
 namespace App\Entity;
 
-use ApiPlatform\Metadata\GetCollection;
+use App\Entity\Commande;
 use ApiPlatform\Metadata\Get;
-use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Post;
 use Doctrine\ORM\Mapping as ORM;
 use App\Repository\ClientRepository;
+use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\GetCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\Common\Collections\ArrayCollection;
 use Symfony\Component\Serializer\Annotation\Groups;
@@ -23,7 +24,6 @@ class Client extends User
 {
     // #[ApiSubresource]
     #[ORM\OneToMany(mappedBy: 'client', targetEntity: Commande::class)]
-    #[Groups(["commande:client:read"])]
     private $commandes;
     public function __construct()
     {

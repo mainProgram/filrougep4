@@ -2,43 +2,60 @@
 
 namespace App\Entity;
 
-use ApiPlatform\Metadata\Link;
-use ApiPlatform\Metadata\GetCollection;
-use ApiPlatform\Metadata\Put;
+use App\Entity\Zone;
+use App\Entity\Client;
+use App\Entity\Ticket;
+use App\Entity\Livraison;
+use App\Entity\CommandeMenu;
+use App\Entity\Gestionnaire;
 use ApiPlatform\Metadata\Get;
-use ApiPlatform\Metadata\ApiResource;
-use ApiPlatform\Metadata\ApiProperty;
-use ApiPlatform\Doctrine\Orm\Filter\DateFilter;
-use ApiPlatform\Doctrine\Orm\Filter\ExistsFilter;
-use ApiPlatform\Doctrine\Orm\Filter\SearchFilter;
-use ApiPlatform\Metadata\ApiFilter;
+use ApiPlatform\Metadata\Put;
+use App\Entity\CommandeFrite;
+use ApiPlatform\Metadata\Link;
 use ApiPlatform\Metadata\Post;
+use App\Entity\CommandeBurger;
 use Doctrine\ORM\Mapping as ORM;
 use App\Services\CommandeService;
+use ApiPlatform\Metadata\ApiFilter;
+use ApiPlatform\Metadata\ApiProperty;
+use ApiPlatform\Metadata\ApiResource;
+use App\Entity\CommandeTailleBoisson;
 use App\Repository\CommandeRepository;
+use App\State\CommandesClientProvider;
+use ApiPlatform\Metadata\GetCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\Common\Collections\ArrayCollection;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
-use Symfony\Component\Serializer\Annotation\SerializedName;
+use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\DateFilter;
+use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\ExistsFilter;
+use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\SearchFilter;
 #[ApiResource(
     operations: [
         new Get(normalizationContext: ['groups' => ['commande:client:detail']]), 
         new Put(normalizationContext: ['groups' => ['commande:list']]), 
-        new Post(status: 201, normalizationContext: ['groups' => ['commande:read']]), 
+        new Post(status: 201, denormalizationContext: ['groups' => ['commande:client:read']], normalizationContext: ['groups' => ['commande:client:detail']]), 
         new GetCollection(paginationItemsPerPage: 10, status: 200, normalizationContext: ['groups' => ['commande:list']])
     ]
 )]
+#[ApiFilter(SearchFilter::class, properties: ['zone.nom' => 'ipartial', "etat" => 'exact', 'zone.id' => 'exact' ])]
+#[ApiFilter(ExistsFilter::class, properties: ['zone'])]
+#[ApiFilter(DateFilter::class, properties: ['date'])]
 #[ORM\Entity(repositoryClass: CommandeRepository::class)]
-#[Assert\Callback([CommandeService::class, "isThereABurgerOrAMenu"])]
-#[ApiFilter(filterClass: DateFilter::class, properties: ['date'])]
 #[ApiResource(
     uriTemplate: '/clients/{id}/commandes.{_format}', 
-    uriVariables: ['id' => new Link(fromClass: \App\Entity\Client::class, identifiers: ['id'])], 
+    uriVariables: ['id' => new Link(fromClass: Client::class, fromProperty: 'commandes')], 
     status: 200, 
-    filters: ['annotated_app_entity_commande_api_platform_core_bridge_doctrine_orm_filter_search_filter', 'annotated_app_entity_commande_api_platform_core_bridge_doctrine_orm_filter_exists_filter', 'annotated_app_entity_commande_api_platform_core_bridge_doctrine_orm_filter_date_filter'], 
-    operations: [new GetCollection()]
+    operations: [new GetCollection()],
+    normalizationContext: ['groups' => ['commande:client:detail']]
 )]
+// #[ApiResource(
+//     uriTemplate: '/clients/{id}/commandees.{_format}', 
+//     provider: CommandesClientProvider::class,
+//     status: 200, 
+//     operations: [new GetCollection()],
+//     normalizationContext: ['groups' => ['commande:client:detail']]
+// )]
 class Commande
 {
     #[ORM\Id]
@@ -47,14 +64,14 @@ class Commande
     #[ORM\Column(type: 'integer')]
     private $id;
     #[ORM\ManyToOne(targetEntity: Client::class, inversedBy: 'commandes')]
-    #[Groups(["commande:list", "livraison:detail"])]
+    #[Groups(["commande:list", "livraison:detail", "commande:client:read"])]
     #[Assert\NotNull(message: "Renseignez le client !")]
     private $client;
     #[ORM\ManyToOne(targetEntity: Livraison::class, inversedBy: 'commandes')]
     private $livraison;
     #[ORM\ManyToOne(targetEntity: Gestionnaire::class, inversedBy: 'commandes')]
     private $gestionnaire;
-    #[Groups(["commande:client:detail", "commande:list", "livraison:detail"])]
+    #[Groups(["commande:client:detail", "commande:list", "livraison:detail", "commande:client:read"])]
     #[ORM\ManyToOne(targetEntity: Zone::class, inversedBy: 'commandes')]
     private $zone;
     #[ORM\OneToOne(targetEntity: Ticket::class, cascade: ['persist', 'remove'])]
@@ -68,10 +85,10 @@ class Commande
     #[ORM\Column(type: 'float', nullable: true)]
     private $prix;
     #[ORM\OneToMany(mappedBy: 'commande', targetEntity: CommandeTailleBoisson::class, cascade: ["persist"])]
-    #[Groups(["commande:client:detail"])]
+    #[Groups(["commande:client:detail", "livraison:detail", "commande:client:read"])]
     #[Assert\Valid]
     private $commandeTailleBoissons;
-    #[Groups(["commande:client:read", "commande:list"])]
+    #[Groups(["commande:list", "commande:client:detail"])]
     #[ORM\Column(type: 'datetime', nullable: true)]
     private $date;
     #[Groups(["commande:list", "livraison:detail"])]
@@ -79,15 +96,15 @@ class Commande
     private $numero;
     #[Assert\Valid]
     #[ORM\OneToMany(mappedBy: 'commande', targetEntity: CommandeMenu::class, cascade: ["persist"])]
-    #[Groups(["commande:client:detail"])]
+    #[Groups(["commande:client:detail", "livraison:detail", "commande:client:read"])]
     private $commandeMenus;
     #[Assert\Valid]
     #[ORM\OneToMany(mappedBy: 'commande', targetEntity: CommandeFrite::class, cascade: ["persist"])]
-    #[Groups(["commande:client:detail"])]
+    #[Groups(["commande:client:detail", "livraison:detail", 'commande:read', "commande:client:read"])]
     private $commandeFrites;
     #[Assert\Valid]
     #[ORM\OneToMany(mappedBy: 'commande', targetEntity: CommandeBurger::class, cascade: ["persist"])]
-    #[Groups(["commande:client:detail"])]
+    #[Groups(["commande:client:detail", "livraison:detail", "commande:client:read"])]
     private $commandeBurgers;
     public function __construct()
     {
